@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product List</title>
+  <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Product List</h1>
+    <div class="darkmode-toggle">
+      <label class="switch">
+        <input type="checkbox" id="darkModeToggle">
+        <span class="slider"></span>
+      </label>
+      <span class="toggle-label">Dark Mode</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <section class="controls">
+      <input type="text" id="searchInput" placeholder="Search product name or code..." />
+
+      <div class="price-filter">
+        <label class="switch">
+          <input type="checkbox" id="togglePriceFilter" />
+          <span class="slider"></span>
+        </label>
+        <span class="toggle-label">Enable Price Filter</span>
+        <div id="priceRange" class="range-container hidden">
+          <input type="number" id="minPrice" placeholder="Min" min="0" />
+          <span class="to">to</span>
+          <input type="number" id="maxPrice" placeholder="Max" min="0" />
+        </div>
+      </div>
+    </section>
+
+    <main>
+      <div class="table-container">
+        <table id="productTable">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Product Name</th>
+              <th>Product Code</th>
+              <th>Marketing Price</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div id="noResults" class="hidden">No products match your search.</div>
+      </div>
+    </main>
+  </div>
+
+  <button id="scrollTopBtn"></button>
+
+  <script src="script.js"></script>
+</body>
+</html>
