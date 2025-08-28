@@ -158,6 +158,16 @@ h1 {
   transition: all var(--transition-normal);
 }
 
+.range-container input[type=number]::-webkit-inner-spin-button,
+.range-container input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.range-container input[type=number] {
+  -moz-appearance: textfield;
+}
+
 .range-container .to {
   font-weight: 600;
 }
