@@ -5,6 +5,7 @@
 !products.json
 !.gitignore
 !.github/
+!.github/workflows/
 !product_scraper.py
 !requirements.txt
 !last_updated.txt
