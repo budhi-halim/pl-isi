@@ -1,9 +1,34 @@
 let debounceTimer;
 
-/* Load and initialize products */
+async function fetchLastUpdated() {
+  try {
+    const res = await fetch("last_updated.txt", { cache: "no-store" });
+    if (!res.ok) return null;
+    const txt = (await res.text()).trim();
+    if (!txt) return null;
+    const iso = /^\d{4}-\d{2}-\d{2}$/.test(txt) ? txt : null;
+    if (iso) {
+      const parts = iso.split("-");
+      const year = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const day = parseInt(parts[2], 10);
+      const d = new Date(Date.UTC(year, month, day));
+      const monthNames = [
+        "January","February","March","April","May","June",
+        "July","August","September","October","November","December"
+      ];
+      return `${day} ${monthNames[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+    } else {
+      return txt;
+    }
+  } catch (e) {
+    return null;
+  }
+}
+
 async function loadProducts() {
   try {
-    const response = await fetch("products.json");
+    const response = await fetch("products.json", { cache: "no-store" });
     const products = await response.json();
     renderTable(products);
 
@@ -23,8 +48,8 @@ async function loadProducts() {
 
       const filtered = products.filter((p) => {
         const matchText =
-          p.product_name.toLowerCase().includes(query) ||
-          p.product_code.toLowerCase().includes(query);
+          (p.product_name && p.product_name.toLowerCase().includes(query)) ||
+          (p.product_code && p.product_code.toLowerCase().includes(query));
 
         if (!matchText) return false;
 
@@ -38,13 +63,11 @@ async function loadProducts() {
       renderTable(filtered);
     }
 
-    /* Debounced search */
     searchInput.addEventListener("input", () => {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(applyFilters, 300);
     });
 
-    /* Price filter */
     togglePriceFilter.addEventListener("change", () => {
       document
         .getElementById("priceRange")
@@ -54,7 +77,6 @@ async function loadProducts() {
     minPrice.addEventListener("input", applyFilters);
     maxPrice.addEventListener("input", applyFilters);
 
-    /* Scroll-to-top button */
     window.addEventListener("scroll", () => {
       if (window.scrollY > window.innerHeight) {
         scrollTopBtn.classList.add("show");
@@ -67,7 +89,6 @@ async function loadProducts() {
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
-    /* Dark mode */
     const colorSchemeMedia = window.matchMedia("(prefers-color-scheme: dark)");
 
     if (colorSchemeMedia.matches) {
@@ -108,13 +129,12 @@ async function loadProducts() {
   }
 }
 
-/* Render table */
 function renderTable(products) {
   const tbody = document.querySelector("#productTable tbody");
   const noResults = document.getElementById("noResults");
   tbody.innerHTML = "";
 
-  if (products.length === 0) {
+  if (!products || products.length === 0) {
     noResults.classList.remove("hidden");
     return;
   } else {
@@ -125,12 +145,19 @@ function renderTable(products) {
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${i + 1}</td>
-      <td>${p.product_name}</td>
-      <td>${p.product_code}</td>
+      <td>${p.product_name || ""}</td>
+      <td>${p.product_code || ""}</td>
       <td>${p.marketing_price || ""}</td>
     `;
     tbody.appendChild(row);
   });
 }
 
-document.addEventListener("DOMContentLoaded", loadProducts);
+document.addEventListener("DOMContentLoaded", async () => {
+  const lastUpdatedEl = document.getElementById("lastUpdated");
+  const formatted = await fetchLastUpdated();
+  if (formatted && lastUpdatedEl) {
+    lastUpdatedEl.textContent = `Last updated: ${formatted}`;
+  }
+  loadProducts();
+});

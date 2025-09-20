@@ -4,3 +4,7 @@
 !script.js
 !products.json
 !.gitignore
+!.github/
+!product_scraper.py
+!requirements.txt
+!last_updated.txt

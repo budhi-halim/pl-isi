@@ -345,3 +345,15 @@ body.dark #scrollTopBtn {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Last updated text */
+#lastUpdated {
+  font-size: var(--font-size-small);
+  color: var(--color-muted);
+  margin-bottom: var(--spacing-md);
+  text-align: right;
+}
+
+body.dark #lastUpdated {
+  color: var(--color-muted);
+}
