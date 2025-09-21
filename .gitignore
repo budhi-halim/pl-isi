@@ -6,6 +6,8 @@
 !.gitignore
 !.github/
 !.github/workflows/
+!.github/workflows/*.yml
+!.github/workflows/*.yaml
 !product_scraper.py
 !requirements.txt
 !last_updated.txt
