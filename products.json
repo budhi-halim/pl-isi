@@ -62,7 +62,7 @@
   {
     "product_name": "ABON SEASONING",
     "product_code": "31201359",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "ABON SEASONING",
@@ -117,6 +117,11 @@
   {
     "product_name": "ABON SEASONING",
     "product_code": "31201703",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "ABON SEASONING",
+    "product_code": "31201705",
     "marketing_price": ""
   },
   {
@@ -398,6 +403,11 @@
     "product_name": "AYAM BAKAR SEASONING",
     "product_code": "31103051",
     "marketing_price": "3.7"
+  },
+  {
+    "product_name": "AYAM BAKAR SEASONING",
+    "product_code": "31103066",
+    "marketing_price": ""
   },
   {
     "product_name": "AYAM BAKAR SEASONING",
@@ -870,6 +880,16 @@
     "marketing_price": ""
   },
   {
+    "product_name": "AYAM PEDAS MANIS SMOKE PASTE",
+    "product_code": "34100048",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "AYAM PEDAS MANIS SMOKE PASTE",
+    "product_code": "34100049",
+    "marketing_price": ""
+  },
+  {
     "product_name": "AYAM PEDAS SEASONING",
     "product_code": "31102773",
     "marketing_price": "3.15"
@@ -928,11 +948,6 @@
     "product_name": "AYAM SZECHUAN SEASONING",
     "product_code": "31103000",
     "marketing_price": "0"
-  },
-  {
-    "product_name": "Ayam Pedas Manis Smoke Pasta",
-    "product_code": "34100048",
-    "marketing_price": ""
   },
   {
     "product_name": "BABY SILKY PUDDING POWDER",
@@ -1802,17 +1817,12 @@
   {
     "product_name": "BALADO SEASONING",
     "product_code": "31407828",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "BALADO SEASONING",
     "product_code": "31407836",
     "marketing_price": "3.2"
-  },
-  {
-    "product_name": "BALADO SEASONING",
-    "product_code": "31407871",
-    "marketing_price": "3.25"
   },
   {
     "product_name": "BALADO SEASONING",
@@ -1946,11 +1956,6 @@
   },
   {
     "product_name": "BALADO SEASONING",
-    "product_code": "MT-730614",
-    "marketing_price": "3"
-  },
-  {
-    "product_name": "BALADO SEASONING",
     "product_code": "MT-742314",
     "marketing_price": "2.5"
   },
@@ -2058,6 +2063,11 @@
     "product_name": "BANANA SEASONING",
     "product_code": "31900681",
     "marketing_price": "4.15"
+  },
+  {
+    "product_name": "BANANA SEASONING",
+    "product_code": "31900685",
+    "marketing_price": ""
   },
   {
     "product_name": "BANANA SMOOTHIES MIX (AMG)",
@@ -2481,11 +2491,6 @@
   },
   {
     "product_name": "BBQ SEASONING",
-    "product_code": "31405355",
-    "marketing_price": "9.15"
-  },
-  {
-    "product_name": "BBQ SEASONING",
     "product_code": "31405356",
     "marketing_price": "7.4"
   },
@@ -2537,7 +2542,7 @@
   {
     "product_name": "BBQ SEASONING",
     "product_code": "31405857",
-    "marketing_price": "2.25"
+    "marketing_price": "2.85"
   },
   {
     "product_name": "BBQ SEASONING",
@@ -3001,17 +3006,22 @@
   },
   {
     "product_name": "BBQ SEASONING",
-    "product_code": "31407872",
-    "marketing_price": "4.05"
-  },
-  {
-    "product_name": "BBQ SEASONING",
     "product_code": "31407876",
     "marketing_price": ""
   },
   {
     "product_name": "BBQ SEASONING",
     "product_code": "31407883",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "BBQ SEASONING",
+    "product_code": "31407942",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "BBQ SEASONING",
+    "product_code": "31407943",
     "marketing_price": ""
   },
   {
@@ -3372,7 +3382,7 @@
   {
     "product_name": "BEEF POWDER",
     "product_code": "31201506",
-    "marketing_price": "2.6"
+    "marketing_price": "3.05"
   },
   {
     "product_name": "BEEF POWDER",
@@ -5891,11 +5901,6 @@
   },
   {
     "product_name": "CHEESE SEASONING",
-    "product_code": "31502720",
-    "marketing_price": "8.5"
-  },
-  {
-    "product_name": "CHEESE SEASONING",
     "product_code": "31502725",
     "marketing_price": "7.2"
   },
@@ -6436,11 +6441,6 @@
   },
   {
     "product_name": "CHEESE SEASONING",
-    "product_code": "31503339",
-    "marketing_price": "4.05"
-  },
-  {
-    "product_name": "CHEESE SEASONING",
     "product_code": "31503340",
     "marketing_price": ""
   },
@@ -6978,6 +6978,11 @@
     "product_name": "CHICKEN ONION SEASONING",
     "product_code": "MT-1107031-1",
     "marketing_price": "3.4"
+  },
+  {
+    "product_name": "CHICKEN PEPPER SEASONING",
+    "product_code": "31407937",
+    "marketing_price": ""
   },
   {
     "product_name": "CHICKEN POWDER",
@@ -7592,6 +7597,16 @@
   {
     "product_name": "CHICKEN SEASONING",
     "product_code": "31103017",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "CHICKEN SEASONING",
+    "product_code": "31103064",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "CHICKEN SEASONING",
+    "product_code": "31103065",
     "marketing_price": ""
   },
   {
@@ -9852,7 +9867,7 @@
   {
     "product_name": "DIPPING SAUCE SOUR CREAM & ONION",
     "product_code": "31503200",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "DRIED FISH CAKE",
@@ -10347,7 +10362,7 @@
   {
     "product_name": "FRIED GARLIC SEASONING",
     "product_code": "31801907",
-    "marketing_price": "6"
+    "marketing_price": "6.8"
   },
   {
     "product_name": "FRIED GARLIC SEASONING",
@@ -11392,7 +11407,17 @@
   {
     "product_name": "GOCHUJANG PASTA",
     "product_code": "34400463",
-    "marketing_price": "0"
+    "marketing_price": "5.50"
+  },
+  {
+    "product_name": "GOCHUJANG PASTA",
+    "product_code": "34400467",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "GOCHUJANG PASTA",
+    "product_code": "34400470",
+    "marketing_price": ""
   },
   {
     "product_name": "GOCHUJANG POWDER",
@@ -12661,6 +12686,11 @@
   },
   {
     "product_name": "ITALIAN PIZZA SEASONING",
+    "product_code": "31407935",
+    "marketing_price": "0"
+  },
+  {
+    "product_name": "ITALIAN PIZZA SEASONING",
     "product_code": "31503337",
     "marketing_price": "0"
   },
@@ -13087,12 +13117,12 @@
   {
     "product_name": "JAPANESE CURRY SEASONING",
     "product_code": "31407923",
-    "marketing_price": "0"
+    "marketing_price": "3.70"
   },
   {
     "product_name": "JAPANESE CURRY SEASONING",
     "product_code": "31407929",
-    "marketing_price": ""
+    "marketing_price": "3.90"
   },
   {
     "product_name": "JAPANESE HAMBURG SEASONING",
@@ -13102,6 +13132,11 @@
   {
     "product_name": "JAPANESE HAMBURG SEASONING",
     "product_code": "31700514",
+    "marketing_price": "0"
+  },
+  {
+    "product_name": "JAPANESE HAMBURG SEASONING",
+    "product_code": "31700516",
     "marketing_price": "0"
   },
   {
@@ -13192,6 +13227,11 @@
   {
     "product_name": "JASUKE SEASONING",
     "product_code": "31603047",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "JASUKE SEASONING",
+    "product_code": "31603048",
     "marketing_price": ""
   },
   {
@@ -14800,6 +14840,11 @@
     "marketing_price": "4.4"
   },
   {
+    "product_name": "KOREAN SPICY NOODLE PASTE",
+    "product_code": "34400468",
+    "marketing_price": ""
+  },
+  {
     "product_name": "KOYA POWDER",
     "product_code": "31802534",
     "marketing_price": ""
@@ -15262,7 +15307,7 @@
   {
     "product_name": "MARINARA SEASONING",
     "product_code": "31407900",
-    "marketing_price": "0"
+    "marketing_price": "6.30"
   },
   {
     "product_name": "MARINASI AYAM SEASONING",
@@ -15387,7 +15432,7 @@
   {
     "product_name": "MARINATION SEASONING",
     "product_code": "31407904",
-    "marketing_price": "0"
+    "marketing_price": "6.10"
   },
   {
     "product_name": "MARINATION SEASONING / MARINASI 2",
@@ -15682,6 +15727,11 @@
   {
     "product_name": "MELON SEASONING",
     "product_code": "31900682",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "MELON SEASONING",
+    "product_code": "31900686",
     "marketing_price": ""
   },
   {
@@ -15982,7 +16032,7 @@
   {
     "product_name": "MIE GORENG SEASONING",
     "product_code": "31407933",
-    "marketing_price": ""
+    "marketing_price": "3.5"
   },
   {
     "product_name": "MIE GORENG SEASONING",
@@ -16325,6 +16375,16 @@
     "marketing_price": ""
   },
   {
+    "product_name": "NACHO CHEESE SEASONING",
+    "product_code": "31503358",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "NACHO CHEESE SEASONING",
+    "product_code": "31503359",
+    "marketing_price": ""
+  },
+  {
     "product_name": "NACHO CHEESE SEASONING / PR 0814",
     "product_code": "31502674",
     "marketing_price": "8.8"
@@ -16343,11 +16403,6 @@
     "product_name": "NANAS SEASONING",
     "product_code": "31900644",
     "marketing_price": "3.0"
-  },
-  {
-    "product_name": "NANAS SEASONING",
-    "product_code": "31900658",
-    "marketing_price": "3.50"
   },
   {
     "product_name": "NANAS SEASONING",
@@ -16867,7 +16922,7 @@
   {
     "product_name": "ONION POWDER",
     "product_code": "GMS-3012",
-    "marketing_price": "4.4"
+    "marketing_price": "4.50"
   },
   {
     "product_name": "ONION POWDER",
@@ -17875,6 +17930,11 @@
     "marketing_price": "0"
   },
   {
+    "product_name": "PESTO SEASONING",
+    "product_code": "31503352",
+    "marketing_price": ""
+  },
+  {
     "product_name": "PINEAPPLE FLAVOUR",
     "product_code": "B-750",
     "marketing_price": "7.5"
@@ -18476,6 +18536,11 @@
   },
   {
     "product_name": "RENDANG SEASONING",
+    "product_code": "31407941",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "RENDANG SEASONING",
     "product_code": "MT-1204194-1",
     "marketing_price": "3.65"
   },
@@ -18543,6 +18608,11 @@
     "product_name": "RICA-RICA PASTA",
     "product_code": "34400446",
     "marketing_price": "0"
+  },
+  {
+    "product_name": "RICA-RICA PASTA",
+    "product_code": "34400469",
+    "marketing_price": ""
   },
   {
     "product_name": "RICA-RICA PASTE",
@@ -20490,6 +20560,11 @@
     "marketing_price": "0"
   },
   {
+    "product_name": "ROASTED SEAWEED SEASONING",
+    "product_code": "31301699",
+    "marketing_price": ""
+  },
+  {
     "product_name": "ROASTED SWEET CORN SEAS",
     "product_code": "31601989",
     "marketing_price": "0"
@@ -20648,6 +20723,11 @@
     "product_name": "SALTED CARAMEL SEASONING",
     "product_code": "31503259",
     "marketing_price": "0"
+  },
+  {
+    "product_name": "SALTED CARAMEL SEASONING",
+    "product_code": "31503360",
+    "marketing_price": ""
   },
   {
     "product_name": "SALTED CARAMEL SEASONING (KOSHER)",
@@ -21077,7 +21157,7 @@
   {
     "product_name": "SAMBAL BALADO SEASONING",
     "product_code": "31405439",
-    "marketing_price": "2"
+    "marketing_price": "2.5"
   },
   {
     "product_name": "SAMBAL BALADO SEASONING",
@@ -21797,7 +21877,7 @@
   {
     "product_name": "SAMBAL BALADO SEASONING",
     "product_code": "31407695",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "SAMBAL BALADO SEASONING",
@@ -21833,6 +21913,11 @@
     "product_name": "SAMBAL BALADO SEASONING",
     "product_code": "31407926",
     "marketing_price": "3.8"
+  },
+  {
+    "product_name": "SAMBAL BALADO SEASONING",
+    "product_code": "31407940",
+    "marketing_price": ""
   },
   {
     "product_name": "SAMBAL BALADO SEASONING",
@@ -22027,7 +22112,7 @@
   {
     "product_name": "SAMBAL BAWANG SEASONING",
     "product_code": "31407927",
-    "marketing_price": ""
+    "marketing_price": "3.70"
   },
   {
     "product_name": "SAMBAL BAWANG SEASONING",
@@ -22077,7 +22162,7 @@
   {
     "product_name": "SAMBAL GEPREK SEASONING",
     "product_code": "31407610",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "SAMBAL IJO PASTA",
@@ -23526,11 +23611,6 @@
   },
   {
     "product_name": "SEAWEED SEASONING",
-    "product_code": "31301299",
-    "marketing_price": "3"
-  },
-  {
-    "product_name": "SEAWEED SEASONING",
     "product_code": "31301324",
     "marketing_price": "10.75"
   },
@@ -23826,11 +23906,6 @@
   },
   {
     "product_name": "SEAWEED SEASONING",
-    "product_code": "31301692",
-    "marketing_price": ""
-  },
-  {
-    "product_name": "SEAWEED SEASONING",
     "product_code": "31301693",
     "marketing_price": ""
   },
@@ -23857,6 +23932,11 @@
   {
     "product_name": "SEAWEED SEASONING",
     "product_code": "31301698",
+    "marketing_price": "3.10"
+  },
+  {
+    "product_name": "SEAWEED SEASONING",
+    "product_code": "31301701",
     "marketing_price": ""
   },
   {
@@ -23967,12 +24047,12 @@
   {
     "product_name": "SEBLAK PASTA",
     "product_code": "34400464",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "SEBLAK PASTA",
     "product_code": "34400465",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "SEBLAK SEASONING",
@@ -24037,7 +24117,7 @@
   {
     "product_name": "SEBLAK SEASONING",
     "product_code": "31407930",
-    "marketing_price": ""
+    "marketing_price": "3.25"
   },
   {
     "product_name": "SEI SAPI POWDER",
@@ -24861,6 +24941,11 @@
   },
   {
     "product_name": "SOTO SEASONING",
+    "product_code": "31407939",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "SOTO SEASONING",
     "product_code": "MT-348224",
     "marketing_price": "2.8"
   },
@@ -25042,6 +25127,11 @@
   {
     "product_name": "SOUR CREAM SEASONING",
     "product_code": "31503244",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "SOUR CREAM SEASONING",
+    "product_code": "31503361",
     "marketing_price": ""
   },
   {
@@ -25642,7 +25732,7 @@
   {
     "product_name": "SPICY PEANUT SEASONING / SPS 31802413",
     "product_code": "31802413",
-    "marketing_price": "5.0"
+    "marketing_price": "6.0"
   },
   {
     "product_name": "SPICY ROASTED CORN SEASONING",
@@ -25942,7 +26032,12 @@
   {
     "product_name": "SRIRACHA DIPPING SAUCE",
     "product_code": "34400410",
-    "marketing_price": "0"
+    "marketing_price": "3.65"
+  },
+  {
+    "product_name": "SRIRACHA DIPPING SAUCE",
+    "product_code": "34400466",
+    "marketing_price": ""
   },
   {
     "product_name": "SRIRACHA SEASONING",
@@ -27630,11 +27725,6 @@
     "marketing_price": "0"
   },
   {
-    "product_name": "Sriracha Dipping Sauce",
-    "product_code": "34400466",
-    "marketing_price": ""
-  },
-  {
     "product_name": "Strawberry Flavour",
     "product_code": "32900003",
     "marketing_price": ""
@@ -27658,6 +27748,16 @@
     "product_name": "TAMARIND POWDER",
     "product_code": "31802640",
     "marketing_price": "0"
+  },
+  {
+    "product_name": "TANGY SEASONING",
+    "product_code": "31700517",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "TANGY SEASONING",
+    "product_code": "31700518",
+    "marketing_price": ""
   },
   {
     "product_name": "TARO BROWN SUGAR SEASONING",
@@ -28057,6 +28157,11 @@
   {
     "product_name": "THAI HOT SAUCE SEASONING",
     "product_code": "31407902",
+    "marketing_price": "5.10"
+  },
+  {
+    "product_name": "THAI HOT SAUCE SEASONING",
+    "product_code": "31407934",
     "marketing_price": "0"
   },
   {
@@ -28072,6 +28177,11 @@
   {
     "product_name": "THAI SPICY SALAD SEASONING",
     "product_code": "31407866",
+    "marketing_price": "0"
+  },
+  {
+    "product_name": "THAI SPICY SALAD SEASONING",
+    "product_code": "31407938",
     "marketing_price": "0"
   },
   {
@@ -29208,10 +29318,5 @@
     "product_name": "YOGURT SEASONING",
     "product_code": "31503202",
     "marketing_price": "3.95"
-  },
-  {
-    "product_name": "gochujang pasta",
-    "product_code": "34400467",
-    "marketing_price": ""
   }
 ]
