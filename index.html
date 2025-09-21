@@ -20,8 +20,7 @@
   </header>
 
   <div class="container">
-    <!-- Last updated status -->
-    <p id="lastUpdated">Last updated: 20 September 2025</p>
+    <p id="lastUpdated" aria-live="polite">Last updated: Not available</p>
 
     <section class="controls">
       <input type="text" id="searchInput" placeholder="Search product name or code..." />
@@ -42,7 +41,7 @@
 
     <main>
       <div class="table-container">
-        <table id="productTable">
+        <table id="productTable" aria-describedby="noResults">
           <thead>
             <tr>
               <th>No</th>
@@ -58,7 +57,7 @@
     </main>
   </div>
 
-  <button id="scrollTopBtn"></button>
+  <button id="scrollTopBtn" aria-label="Scroll to top"></button>
 
   <script src="script.js"></script>
 </body>

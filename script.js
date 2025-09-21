@@ -6,21 +6,20 @@ async function fetchLastUpdated() {
     if (!res.ok) return null;
     const txt = (await res.text()).trim();
     if (!txt) return null;
-    const iso = /^\d{4}-\d{2}-\d{2}$/.test(txt) ? txt : null;
-    if (iso) {
-      const parts = iso.split("-");
-      const year = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1;
-      const day = parseInt(parts[2], 10);
-      const d = new Date(Date.UTC(year, month, day));
+    const match = txt.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (match) {
+      const year = match[1];
+      const monthIndex = parseInt(match[2], 10) - 1;
+      const day = parseInt(match[3], 10);
       const monthNames = [
         "January","February","March","April","May","June",
         "July","August","September","October","November","December"
       ];
-      return `${day} ${monthNames[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
-    } else {
-      return txt;
+      if (monthIndex >= 0 && monthIndex <= 11) {
+        return `${day} ${monthNames[monthIndex]} ${year}`;
+      }
     }
+    return null;
   } catch (e) {
     return null;
   }
@@ -41,15 +40,15 @@ async function loadProducts() {
     const darkToggleContainer = document.querySelector(".darkmode-toggle");
 
     function applyFilters() {
-      const query = searchInput.value.toLowerCase();
+      const query = (searchInput.value || "").toLowerCase();
       const enablePrice = togglePriceFilter.checked;
       const min = parseFloat(minPrice.value) || 0;
       const max = parseFloat(maxPrice.value) || Infinity;
 
-      const filtered = products.filter((p) => {
-        const matchText =
-          (p.product_name && p.product_name.toLowerCase().includes(query)) ||
-          (p.product_code && p.product_code.toLowerCase().includes(query));
+      const filtered = (products || []).filter((p) => {
+        const name = (p.product_name || "").toString().toLowerCase();
+        const code = (p.product_code || "").toString().toLowerCase();
+        const matchText = name.includes(query) || code.includes(query);
 
         if (!matchText) return false;
 
@@ -158,6 +157,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const formatted = await fetchLastUpdated();
   if (formatted && lastUpdatedEl) {
     lastUpdatedEl.textContent = `Last updated: ${formatted}`;
+  } else if (lastUpdatedEl) {
+    lastUpdatedEl.textContent = "Last updated: Not available";
   }
   loadProducts();
 });
