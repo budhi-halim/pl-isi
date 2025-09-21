@@ -2,7 +2,7 @@ name: Daily product scrape
 
 on:
   schedule:
-    - cron: '30 1 * * *'   # 01:30 UTC = 08:30 GMT+7 (Jakarta)
+    - cron: '30 1 * * 1,3,5'   # 01:30 UTC = 08:30 GMT+7 (Jakarta) on Mon, Wed, Fri
   workflow_dispatch: {}
 
 permissions:
