@@ -636,6 +636,11 @@
   },
   {
     "product_name": "AYAM BAWANG SEASONING",
+    "product_code": "31103067",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "AYAM BAWANG SEASONING",
     "product_code": "31103096",
     "marketing_price": ""
   },
@@ -3022,6 +3027,11 @@
   {
     "product_name": "BBQ SEASONING",
     "product_code": "31407943",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "BBQ SEASONING",
+    "product_code": "31407948",
     "marketing_price": ""
   },
   {
@@ -11625,6 +11635,11 @@
     "marketing_price": ""
   },
   {
+    "product_name": "GULAI SEASONING",
+    "product_code": "31407945",
+    "marketing_price": ""
+  },
+  {
     "product_name": "GULAI SEASONING / KARE SEASONING MT-1202784-0",
     "product_code": "MT-1202784-0",
     "marketing_price": "3.5"
@@ -15438,6 +15453,16 @@
     "product_name": "MARINATION SEASONING",
     "product_code": "31407904",
     "marketing_price": "6.10"
+  },
+  {
+    "product_name": "MARINATION SEASONING",
+    "product_code": "31407947",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "MARINATION SEASONING",
+    "product_code": "31407949",
+    "marketing_price": ""
   },
   {
     "product_name": "MARINATION SEASONING / MARINASI 2",
@@ -23892,7 +23917,7 @@
   {
     "product_name": "SEAWEED SEASONING",
     "product_code": "31301686",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "SEAWEED SEASONING",
@@ -24947,6 +24972,11 @@
   {
     "product_name": "SOTO SEASONING",
     "product_code": "31407939",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "SOTO SEASONING",
+    "product_code": "31407944",
     "marketing_price": ""
   },
   {
@@ -28385,6 +28415,11 @@
     "marketing_price": "0"
   },
   {
+    "product_name": "TOM YUM SEASONING",
+    "product_code": "31301702",
+    "marketing_price": ""
+  },
+  {
     "product_name": "TOM YUM SOUP SEASONING",
     "product_code": "31301376",
     "marketing_price": "4.45"
@@ -28803,6 +28838,11 @@
     "product_name": "TTEOKBOKKI SEASONING",
     "product_code": "31407907",
     "marketing_price": "0"
+  },
+  {
+    "product_name": "TTEOKBOKKI SEASONING",
+    "product_code": "31407950",
+    "marketing_price": ""
   },
   {
     "product_name": "TUNA MAYO SEASONING",
