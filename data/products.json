@@ -895,6 +895,11 @@
     "marketing_price": ""
   },
   {
+    "product_name": "AYAM PEDAS MANIS SMOKE PASTE",
+    "product_code": "34100050",
+    "marketing_price": ""
+  },
+  {
     "product_name": "AYAM PEDAS SEASONING",
     "product_code": "31102773",
     "marketing_price": "3.15"
@@ -4615,6 +4620,11 @@
     "marketing_price": ""
   },
   {
+    "product_name": "BUTTER SEASONING",
+    "product_code": "31503363",
+    "marketing_price": ""
+  },
+  {
     "product_name": "BUTTER SWEET SEASONING",
     "product_code": "31503315",
     "marketing_price": "5.65"
@@ -5477,7 +5487,7 @@
   {
     "product_name": "CHEESE OIL",
     "product_code": "MT-559",
-    "marketing_price": "7.78"
+    "marketing_price": "8.75"
   },
   {
     "product_name": "CHEESE PASTA",
@@ -11430,6 +11440,11 @@
     "marketing_price": ""
   },
   {
+    "product_name": "GOCHUJANG PASTA",
+    "product_code": "34400472",
+    "marketing_price": ""
+  },
+  {
     "product_name": "GOCHUJANG POWDER",
     "product_code": "31406788",
     "marketing_price": ""
@@ -14887,6 +14902,11 @@
   {
     "product_name": "KOYA SEASONING",
     "product_code": "31802650",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "KOYA SEASONING",
+    "product_code": "31802681",
     "marketing_price": ""
   },
   {
@@ -18645,6 +18665,11 @@
     "marketing_price": ""
   },
   {
+    "product_name": "RICA-RICA PASTA",
+    "product_code": "34400471",
+    "marketing_price": ""
+  },
+  {
     "product_name": "RICA-RICA PASTE",
     "product_code": "34400252",
     "marketing_price": "8"
@@ -20592,6 +20617,11 @@
   {
     "product_name": "ROASTED SEAWEED SEASONING",
     "product_code": "31301699",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "ROASTED SEAWEED SEASONING",
+    "product_code": "31301703",
     "marketing_price": ""
   },
   {
@@ -26517,6 +26547,11 @@
   {
     "product_name": "SUGAR CINNAMON SEASONING",
     "product_code": "31406593",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "SUGAR CINNAMON SEASONING",
+    "product_code": "31407951",
     "marketing_price": ""
   },
   {
