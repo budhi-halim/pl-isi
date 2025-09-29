@@ -636,6 +636,11 @@
   },
   {
     "product_name": "AYAM BAWANG SEASONING",
+    "product_code": "31103067",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "AYAM BAWANG SEASONING",
     "product_code": "31103096",
     "marketing_price": ""
   },
@@ -887,6 +892,11 @@
   {
     "product_name": "AYAM PEDAS MANIS SMOKE PASTE",
     "product_code": "34100049",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "AYAM PEDAS MANIS SMOKE PASTE",
+    "product_code": "34100050",
     "marketing_price": ""
   },
   {
@@ -1823,6 +1833,16 @@
     "product_name": "BALADO SEASONING",
     "product_code": "31407836",
     "marketing_price": "3.2"
+  },
+  {
+    "product_name": "BALADO SEASONING",
+    "product_code": "31407952",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "BALADO SEASONING",
+    "product_code": "31407953",
+    "marketing_price": ""
   },
   {
     "product_name": "BALADO SEASONING",
@@ -3022,6 +3042,11 @@
   {
     "product_name": "BBQ SEASONING",
     "product_code": "31407943",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "BBQ SEASONING",
+    "product_code": "31407948",
     "marketing_price": ""
   },
   {
@@ -4605,6 +4630,11 @@
     "marketing_price": ""
   },
   {
+    "product_name": "BUTTER SEASONING",
+    "product_code": "31503363",
+    "marketing_price": ""
+  },
+  {
     "product_name": "BUTTER SWEET SEASONING",
     "product_code": "31503315",
     "marketing_price": "5.65"
@@ -5445,6 +5475,11 @@
     "marketing_price": ""
   },
   {
+    "product_name": "CHEESE GRANULE",
+    "product_code": "31503364",
+    "marketing_price": ""
+  },
+  {
     "product_name": "CHEESE HERBS SEASONING",
     "product_code": "31503040",
     "marketing_price": "0"
@@ -5467,7 +5502,7 @@
   {
     "product_name": "CHEESE OIL",
     "product_code": "MT-559",
-    "marketing_price": "7.78"
+    "marketing_price": "8.75"
   },
   {
     "product_name": "CHEESE PASTA",
@@ -5897,7 +5932,7 @@
   {
     "product_name": "CHEESE SEASONING",
     "product_code": "31502696",
-    "marketing_price": "6.3"
+    "marketing_price": "7.85"
   },
   {
     "product_name": "CHEESE SEASONING",
@@ -7611,6 +7646,16 @@
   },
   {
     "product_name": "CHICKEN SEASONING",
+    "product_code": "31103068",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "CHICKEN SEASONING",
+    "product_code": "31103069",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "CHICKEN SEASONING",
     "product_code": "MT-1201871-0",
     "marketing_price": "25000"
   },
@@ -9287,11 +9332,16 @@
   {
     "product_name": "CORN CREAM SOUP SEASONING",
     "product_code": "31602930",
-    "marketing_price": "0"
+    "marketing_price": "12.0"
   },
   {
     "product_name": "CORN MILK POWDER",
     "product_code": "46800006",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "CORN MILK SEASONING",
+    "product_code": "31603049",
     "marketing_price": ""
   },
   {
@@ -11420,6 +11470,11 @@
     "marketing_price": ""
   },
   {
+    "product_name": "GOCHUJANG PASTA",
+    "product_code": "34400472",
+    "marketing_price": ""
+  },
+  {
     "product_name": "GOCHUJANG POWDER",
     "product_code": "31406788",
     "marketing_price": ""
@@ -11622,6 +11677,11 @@
   {
     "product_name": "GULAI SAUS SEASONING",
     "product_code": "31406687",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "GULAI SEASONING",
+    "product_code": "31407945",
     "marketing_price": ""
   },
   {
@@ -11982,6 +12042,11 @@
   {
     "product_name": "HONEY SEASONING",
     "product_code": "31503224",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "HONEY SOY SEASONING",
+    "product_code": "31503362",
     "marketing_price": ""
   },
   {
@@ -14870,6 +14935,11 @@
     "marketing_price": ""
   },
   {
+    "product_name": "KOYA SEASONING",
+    "product_code": "31802681",
+    "marketing_price": ""
+  },
+  {
     "product_name": "KUE PUTU SEASONING",
     "product_code": "31900653",
     "marketing_price": ""
@@ -15433,6 +15503,16 @@
     "product_name": "MARINATION SEASONING",
     "product_code": "31407904",
     "marketing_price": "6.10"
+  },
+  {
+    "product_name": "MARINATION SEASONING",
+    "product_code": "31407947",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "MARINATION SEASONING",
+    "product_code": "31407949",
+    "marketing_price": ""
   },
   {
     "product_name": "MARINATION SEASONING / MARINASI 2",
@@ -16423,6 +16503,11 @@
     "product_name": "NANGKA SEASONING",
     "product_code": "31900558",
     "marketing_price": "2.2"
+  },
+  {
+    "product_name": "NANGKA SEASONING",
+    "product_code": "31900687",
+    "marketing_price": ""
   },
   {
     "product_name": "NASI BIRYANI SEASONING",
@@ -17932,7 +18017,7 @@
   {
     "product_name": "PESTO SEASONING",
     "product_code": "31503352",
-    "marketing_price": ""
+    "marketing_price": "8.0"
   },
   {
     "product_name": "PINEAPPLE FLAVOUR",
@@ -18612,6 +18697,11 @@
   {
     "product_name": "RICA-RICA PASTA",
     "product_code": "34400469",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "RICA-RICA PASTA",
+    "product_code": "34400471",
     "marketing_price": ""
   },
   {
@@ -20565,6 +20655,11 @@
     "marketing_price": ""
   },
   {
+    "product_name": "ROASTED SEAWEED SEASONING",
+    "product_code": "31301703",
+    "marketing_price": ""
+  },
+  {
     "product_name": "ROASTED SWEET CORN SEAS",
     "product_code": "31601989",
     "marketing_price": "0"
@@ -20802,7 +20897,7 @@
   {
     "product_name": "SALTED EGG SEASONING",
     "product_code": "31502593",
-    "marketing_price": "18"
+    "marketing_price": "28.60"
   },
   {
     "product_name": "SALTED EGG SEASONING",
@@ -22162,7 +22257,7 @@
   {
     "product_name": "SAMBAL GEPREK SEASONING",
     "product_code": "31407610",
-    "marketing_price": "0"
+    "marketing_price": "4.15"
   },
   {
     "product_name": "SAMBAL IJO PASTA",
@@ -23887,7 +23982,7 @@
   {
     "product_name": "SEAWEED SEASONING",
     "product_code": "31301686",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "SEAWEED SEASONING",
@@ -24946,6 +25041,11 @@
   },
   {
     "product_name": "SOTO SEASONING",
+    "product_code": "31407944",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "SOTO SEASONING",
     "product_code": "MT-348224",
     "marketing_price": "2.8"
   },
@@ -25607,7 +25707,7 @@
   {
     "product_name": "SPICY CURRY SEASONING",
     "product_code": "31407901",
-    "marketing_price": ""
+    "marketing_price": "4.45"
   },
   {
     "product_name": "SPICY CURRY SEASONING",
@@ -26482,6 +26582,11 @@
   {
     "product_name": "SUGAR CINNAMON SEASONING",
     "product_code": "31406593",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "SUGAR CINNAMON SEASONING",
+    "product_code": "31407951",
     "marketing_price": ""
   },
   {
@@ -28380,6 +28485,11 @@
     "marketing_price": "0"
   },
   {
+    "product_name": "TOM YUM SEASONING",
+    "product_code": "31301702",
+    "marketing_price": ""
+  },
+  {
     "product_name": "TOM YUM SOUP SEASONING",
     "product_code": "31301376",
     "marketing_price": "4.45"
@@ -28798,6 +28908,11 @@
     "product_name": "TTEOKBOKKI SEASONING",
     "product_code": "31407907",
     "marketing_price": "0"
+  },
+  {
+    "product_name": "TTEOKBOKKI SEASONING",
+    "product_code": "31407950",
+    "marketing_price": ""
   },
   {
     "product_name": "TUNA MAYO SEASONING",
