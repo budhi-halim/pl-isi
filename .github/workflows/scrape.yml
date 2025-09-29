@@ -1,4 +1,4 @@
-name: Daily product scrape
+name: Product scrape
 
 on:
   schedule:

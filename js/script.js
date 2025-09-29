@@ -1,5 +1,9 @@
 let debounceTimer;
 
+const PRICE_THRESHOLD = 1000;
+const DEBOUNCE_DELAY = 300;
+const EXCHANGE_RATE_URL = 'https://budhi-halim.github.io/exchange-rate/data/today.json';
+
 async function fetchLastUpdated() {
   try {
     const res = await fetch("data/last_updated.txt", { cache: "no-store" });
@@ -25,11 +29,29 @@ async function fetchLastUpdated() {
   }
 }
 
+async function fetchExchangeRate() {
+  try {
+    const response = await fetch(EXCHANGE_RATE_URL);
+    const data = await response.json();
+    return data.buffered_rate;
+  } catch (error) {
+    console.error('Failed to fetch exchange rate:', error);
+    return null;
+  }
+}
+
+function formatWithCommas(str) {
+  const parts = str.toString().split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return parts.join('.');
+}
+
 async function loadProducts() {
   try {
+    let rate = await fetchExchangeRate();
     const response = await fetch("data/products.json", { cache: "no-store" });
     const products = await response.json();
-    renderTable(products);
+    renderTable(products, rate);
 
     const searchInput = document.getElementById("searchInput");
     const togglePriceFilter = document.getElementById("togglePriceFilter");
@@ -45,6 +67,16 @@ async function loadProducts() {
       const min = parseFloat(minPrice.value) || 0;
       const max = parseFloat(maxPrice.value) || Infinity;
 
+      let inputs = [];
+      if (minPrice.value.trim() !== '') inputs.push(min);
+      if (maxPrice.value.trim() !== '') inputs.push(max);
+
+      let searchUnit = null;
+      if (inputs.length > 0) {
+        const highest = Math.max(...inputs);
+        searchUnit = (highest >= PRICE_THRESHOLD) ? 'IDR' : 'USD';
+      }
+
       const filtered = (products || []).filter((p) => {
         const name = (p.product_name || "").toString().toLowerCase();
         const code = (p.product_code || "").toString().toLowerCase();
@@ -52,19 +84,36 @@ async function loadProducts() {
 
         if (!matchText) return false;
 
-        if (enablePrice) {
-          const price = parseFloat(p.marketing_price) || 0;
-          if (price === 0 || price < min || price > max) return false;
+        if (!enablePrice) return true;
+
+        const priceStr = p.marketing_price || "";
+        let price = parseFloat(priceStr) || 0;
+
+        if (!rate) {
+          return price >= min && price <= max;
         }
-        return true;
+
+        if (searchUnit === null) {
+          return price >= min && price <= max;
+        }
+
+        const threshold = PRICE_THRESHOLD;
+        const isUSD = price < threshold;
+        let convertedPrice;
+        if (searchUnit === 'USD') {
+          convertedPrice = isUSD ? price : price / rate;
+        } else {
+          convertedPrice = isUSD ? price * rate : price;
+        }
+        return convertedPrice >= min && convertedPrice <= max;
       });
 
-      renderTable(filtered);
+      renderTable(filtered, rate);
     }
 
     searchInput.addEventListener("input", () => {
       clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(applyFilters, 300);
+      debounceTimer = setTimeout(applyFilters, DEBOUNCE_DELAY);
     });
 
     togglePriceFilter.addEventListener("change", () => {
@@ -73,8 +122,14 @@ async function loadProducts() {
         .classList.toggle("hidden", !togglePriceFilter.checked);
       applyFilters();
     });
-    minPrice.addEventListener("input", applyFilters);
-    maxPrice.addEventListener("input", applyFilters);
+    minPrice.addEventListener("input", () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(applyFilters, DEBOUNCE_DELAY);
+    });
+    maxPrice.addEventListener("input", () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(applyFilters, DEBOUNCE_DELAY);
+    });
 
     window.addEventListener("scroll", () => {
       if (window.scrollY > window.innerHeight) {
@@ -128,7 +183,7 @@ async function loadProducts() {
   }
 }
 
-function renderTable(products) {
+function renderTable(products, rate) {
   const tbody = document.querySelector("#productTable tbody");
   const noResults = document.getElementById("noResults");
   tbody.innerHTML = "";
@@ -141,12 +196,34 @@ function renderTable(products) {
   }
 
   products.forEach((p, i) => {
+    const priceStr = p.marketing_price || "";
+    let displayPrice = formatWithCommas(priceStr);
+    const price = parseFloat(priceStr);
+    if (!isNaN(price) && price > 0 && rate) {
+      const threshold = PRICE_THRESHOLD;
+      const isUSD = price < threshold;
+      if (isUSD) {
+        const idr = price * rate;
+        const ceiledIdr = Math.ceil(idr / 1000) * 1000;
+        const ceiledIdrStr = formatWithCommas(ceiledIdr.toFixed(0));
+        const originalFormatted = formatWithCommas(price.toString());
+        displayPrice = `${originalFormatted} (${ceiledIdrStr})`;
+      } else {
+        const usd = price / rate;
+        const ceiledUsd = Math.ceil(usd * 10) / 10;
+        let usdStr = ceiledUsd.toFixed(1).replace(/\.0$/, '');
+        const usdFormatted = formatWithCommas(usdStr);
+        const originalFormatted = formatWithCommas(price.toString());
+        displayPrice = `${originalFormatted} (${usdFormatted})`;
+      }
+    }
+
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${i + 1}</td>
       <td>${p.product_name || ""}</td>
       <td>${p.product_code || ""}</td>
-      <td>${p.marketing_price || ""}</td>
+      <td>${displayPrice}</td>
     `;
     tbody.appendChild(row);
   });
