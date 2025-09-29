@@ -1836,6 +1836,16 @@
   },
   {
     "product_name": "BALADO SEASONING",
+    "product_code": "31407952",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "BALADO SEASONING",
+    "product_code": "31407953",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "BALADO SEASONING",
     "product_code": "E-501",
     "marketing_price": "2.1"
   },
@@ -5465,6 +5475,11 @@
     "marketing_price": ""
   },
   {
+    "product_name": "CHEESE GRANULE",
+    "product_code": "31503364",
+    "marketing_price": ""
+  },
+  {
     "product_name": "CHEESE HERBS SEASONING",
     "product_code": "31503040",
     "marketing_price": "0"
@@ -7631,6 +7646,16 @@
   },
   {
     "product_name": "CHICKEN SEASONING",
+    "product_code": "31103068",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "CHICKEN SEASONING",
+    "product_code": "31103069",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "CHICKEN SEASONING",
     "product_code": "MT-1201871-0",
     "marketing_price": "25000"
   },
@@ -9312,6 +9337,11 @@
   {
     "product_name": "CORN MILK POWDER",
     "product_code": "46800006",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "CORN MILK SEASONING",
+    "product_code": "31603049",
     "marketing_price": ""
   },
   {
@@ -16473,6 +16503,11 @@
     "product_name": "NANGKA SEASONING",
     "product_code": "31900558",
     "marketing_price": "2.2"
+  },
+  {
+    "product_name": "NANGKA SEASONING",
+    "product_code": "31900687",
+    "marketing_price": ""
   },
   {
     "product_name": "NASI BIRYANI SEASONING",
