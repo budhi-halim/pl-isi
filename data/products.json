@@ -8872,7 +8872,7 @@
   {
     "product_name": "COCOPANDAN SEASONING",
     "product_code": "31900684",
-    "marketing_price": ""
+    "marketing_price": "3.75"
   },
   {
     "product_name": "COCOPANDAN SEASONING",
@@ -13297,6 +13297,16 @@
   {
     "product_name": "JASUKE SEASONING",
     "product_code": "31603048",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "JASUKE SEASONING",
+    "product_code": "31603050",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "JASUKE SEASONING",
+    "product_code": "31603051",
     "marketing_price": ""
   },
   {
@@ -28277,7 +28287,7 @@
   {
     "product_name": "THAI SPICY SALAD",
     "product_code": "31407891",
-    "marketing_price": "0"
+    "marketing_price": "3.50"
   },
   {
     "product_name": "THAI SPICY SALAD SEASONING",
