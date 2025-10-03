@@ -2086,6 +2086,11 @@
   },
   {
     "product_name": "BANANA SEASONING",
+    "product_code": "31900683",
+    "marketing_price": "0"
+  },
+  {
+    "product_name": "BANANA SEASONING",
     "product_code": "31900685",
     "marketing_price": ""
   },
@@ -13192,7 +13197,7 @@
   {
     "product_name": "JAPANESE HAMBURG SEASONING",
     "product_code": "31407916",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "JAPANESE HAMBURG SEASONING",
@@ -15522,6 +15527,11 @@
   {
     "product_name": "MARINATION SEASONING",
     "product_code": "31407949",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "MARINATION SEASONING",
+    "product_code": "31407956",
     "marketing_price": ""
   },
   {
@@ -28873,6 +28883,11 @@
     "product_name": "TORIPAITAN RAMEN SEASONING",
     "product_code": "31407841",
     "marketing_price": "0"
+  },
+  {
+    "product_name": "TORIPAITAN RAMEN SEASONING",
+    "product_code": "31407954",
+    "marketing_price": ""
   },
   {
     "product_name": "TRUFFLE POWDER",
