@@ -1,9 +1,15 @@
+// -------------------------------------------------------------
+// CONSTANTS / CONFIGURATION
+// -------------------------------------------------------------
 let debounceTimer;
 
 const PRICE_THRESHOLD = 1000;
 const DEBOUNCE_DELAY = 300;
 const EXCHANGE_RATE_URL = 'https://budhi-halim.github.io/exchange-rate/data/today.json';
 
+// -------------------------------------------------------------
+// DATA FETCHING (last updated date & exchange rate)
+// -------------------------------------------------------------
 async function fetchLastUpdated() {
   try {
     const res = await fetch("data/last_updated.txt", { cache: "no-store" });
@@ -33,19 +39,28 @@ async function fetchExchangeRate() {
   try {
     const response = await fetch(EXCHANGE_RATE_URL);
     const data = await response.json();
-    return data.buffered_rate;
+    return data.tt_counter_selling_rate_buffered;
   } catch (error) {
     console.error('Failed to fetch exchange rate:', error);
     return null;
   }
 }
 
+// -------------------------------------------------------------
+// UTILITY FUNCTIONS
+// -------------------------------------------------------------
 function formatWithCommas(str) {
   const parts = str.toString().split('.');
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   return parts.join('.');
 }
 
+// -------------------------------------------------------------
+// MAIN FUNCTION: loadProducts()
+// - Loads product data
+// - Applies filtering & sorting logic
+// - Handles UI interactions (search, price filter, dark mode, etc.)
+// -------------------------------------------------------------
 async function loadProducts() {
   try {
     let rate = await fetchExchangeRate();
@@ -61,6 +76,12 @@ async function loadProducts() {
     const darkModeToggle = document.getElementById("darkModeToggle");
     const darkToggleContainer = document.querySelector(".darkmode-toggle");
 
+    // -------------------------------------------------------------
+    // FILTER FUNCTION
+    // - Applies search text filter
+    // - Applies price range filter when enabled
+    // - Excludes items with price 0 or empty when price filter toggle is active
+    // -------------------------------------------------------------
     function applyFilters() {
       const query = (searchInput.value || "").toLowerCase();
       const enablePrice = togglePriceFilter.checked;
@@ -71,24 +92,31 @@ async function loadProducts() {
       if (minPrice.value.trim() !== '') inputs.push(min);
       if (maxPrice.value.trim() !== '') inputs.push(max);
 
+      // Determine search unit based on input threshold
       let searchUnit = null;
       if (inputs.length > 0) {
         const highest = Math.max(...inputs);
         searchUnit = (highest >= PRICE_THRESHOLD) ? 'IDR' : 'USD';
       }
 
+      // Apply combined filtering logic
       const filtered = (products || []).filter((p) => {
         const name = (p.product_name || "").toString().toLowerCase();
         const code = (p.product_code || "").toString().toLowerCase();
         const matchText = name.includes(query) || code.includes(query);
-
         if (!matchText) return false;
+
+        const priceStr = p.marketing_price || "";
+        const price = parseFloat(priceStr) || 0;
+
+        // Exclude zero or empty prices when price filter toggle is enabled
+        if (enablePrice && (!priceStr || price === 0)) {
+          return false;
+        }
 
         if (!enablePrice) return true;
 
-        const priceStr = p.marketing_price || "";
-        let price = parseFloat(priceStr) || 0;
-
+        // Apply numeric range filtering
         if (!rate) {
           return price >= min && price <= max;
         }
@@ -111,6 +139,9 @@ async function loadProducts() {
       renderTable(filtered, rate);
     }
 
+    // -------------------------------------------------------------
+    // EVENT LISTENERS (search, price filter, scroll, dark mode)
+    // -------------------------------------------------------------
     searchInput.addEventListener("input", () => {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(applyFilters, DEBOUNCE_DELAY);
@@ -122,10 +153,12 @@ async function loadProducts() {
         .classList.toggle("hidden", !togglePriceFilter.checked);
       applyFilters();
     });
+
     minPrice.addEventListener("input", () => {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(applyFilters, DEBOUNCE_DELAY);
     });
+
     maxPrice.addEventListener("input", () => {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(applyFilters, DEBOUNCE_DELAY);
@@ -143,6 +176,9 @@ async function loadProducts() {
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
+    // -------------------------------------------------------------
+    // DARK MODE HANDLING
+    // -------------------------------------------------------------
     const colorSchemeMedia = window.matchMedia("(prefers-color-scheme: dark)");
 
     if (colorSchemeMedia.matches) {
@@ -183,6 +219,11 @@ async function loadProducts() {
   }
 }
 
+// -------------------------------------------------------------
+// TABLE RENDERING
+// - Renders product list into the HTML table
+// - Converts prices between USD/IDR for display
+// -------------------------------------------------------------
 function renderTable(products, rate) {
   const tbody = document.querySelector("#productTable tbody");
   const noResults = document.getElementById("noResults");
@@ -199,9 +240,11 @@ function renderTable(products, rate) {
     const priceStr = p.marketing_price || "";
     let displayPrice = formatWithCommas(priceStr);
     const price = parseFloat(priceStr);
+
     if (!isNaN(price) && price > 0 && rate) {
       const threshold = PRICE_THRESHOLD;
       const isUSD = price < threshold;
+
       if (isUSD) {
         const idr = price * rate;
         const ceiledIdr = Math.ceil(idr / 1000) * 1000;
@@ -229,6 +272,9 @@ function renderTable(products, rate) {
   });
 }
 
+// -------------------------------------------------------------
+// INITIALIZATION (runs after DOM is fully loaded)
+// -------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", async () => {
   const lastUpdatedEl = document.getElementById("lastUpdated");
   const formatted = await fetchLastUpdated();
