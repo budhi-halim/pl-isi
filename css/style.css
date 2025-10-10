@@ -32,6 +32,7 @@
   --transition-normal: 0.6s ease;
 }
 
+/* Dark theme variables */
 body.dark {
   --color-primary: #4aa3d8;
   --color-primary-light: #243447;
@@ -47,7 +48,9 @@ body.dark {
   --shadow-lg: 0 6px 20px rgba(255,255,255,0.08);
 }
 
-/* Reset */
+/* ---------------------------
+   Reset / base
+   --------------------------- */
 * {
   margin: 0;
   padding: 0;
@@ -61,6 +64,8 @@ body {
   color: var(--color-text);
   -webkit-tap-highlight-color: transparent;
   transition: all var(--transition-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body.dark {
@@ -68,7 +73,18 @@ body.dark {
   background-image: radial-gradient(circle at top left, rgba(74,163,216,0.15), transparent 70%);
 }
 
-/* Header */
+/* Prevent text selection and touch highlight on long-press */
+body, table, tr, td {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* ---------------------------
+   Header
+   --------------------------- */
 header {
   background: var(--color-primary);
   color: var(--color-white);
@@ -92,7 +108,9 @@ h1 {
   font-weight: 600;
 }
 
-/* Container */
+/* ---------------------------
+   Layout / Container
+   --------------------------- */
 .container {
   max-width: var(--container-max-width);
   margin: var(--spacing-lg) auto;
@@ -100,7 +118,9 @@ h1 {
   transition: all var(--transition-normal);
 }
 
-/* Controls */
+/* ---------------------------
+   Controls
+   --------------------------- */
 .controls {
   display: flex;
   flex-direction: column;
@@ -225,7 +245,9 @@ input:checked + .slider:before {
   font-size: var(--font-size-small);
 }
 
-/* Table */
+/* ---------------------------
+   Table
+   --------------------------- */
 .table-container {
   background: var(--color-white);
   border-radius: var(--radius-lg);
@@ -274,6 +296,7 @@ tbody tr:hover {
   background: var(--color-primary-light);
 }
 
+/* no results */
 #noResults {
   margin-top: var(--spacing-lg);
   text-align: center;
@@ -333,7 +356,103 @@ body.dark #lastUpdated {
   color: var(--color-muted);
 }
 
-/* Responsive */
+/* Keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* -------------------------------------------------------------
+   Last Production Popup
+   ------------------------------------------------------------- */
+.last-prod-popup {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: top left;
+  background: var(--color-white);
+  color: var(--color-text);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 0.8rem;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--color-border-light);
+  font-size: 0.95rem;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  transform: scale(0.98);
+  min-width: 160px;
+  max-width: 320px;
+  line-height: 1.2;
+  white-space: normal;
+  will-change: opacity, transform;
+}
+
+/* When JS wants to hide instantly without a transition, add this helper class.
+   Use: popup.classList.add('no-transition'); remove 'show'; force reflow; then remove 'no-transition'.
+   This prevents the quick hide->show animation flicker. */
+.last-prod-popup.no-transition {
+  transition: none !important;
+}
+
+/* Dark mode adaptation for popup */
+body.dark .last-prod-popup {
+  background: var(--color-white);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+}
+
+/* content inside popup */
+.last-prod-popup .lp-title {
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+  color: var(--color-primary);
+  font-size: 0.95rem;
+}
+
+.last-prod-popup .lp-date {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.2rem;
+}
+
+.last-prod-popup .lp-customer {
+  font-size: 0.92rem;
+  color: var(--color-muted);
+}
+
+.last-prod-popup .lp-none {
+  font-size: 0.95rem;
+  color: var(--color-muted);
+}
+
+/* show state */
+.last-prod-popup.show {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+/* small screens adjustments */
+@media (max-width: 480px) {
+  .last-prod-popup {
+    min-width: 140px;
+    max-width: 260px;
+    padding: 0.5rem 0.7rem;
+    font-size: 0.95rem;
+  }
+}
+
+/* ensure popup/table don't cause layout thrash */
+.table-container,
+.controls,
+.container {
+  will-change: transform;
+}
+
+/* Responsive layout adjustments */
 @media (min-width: 768px) {
   .controls {
     flex-direction: row;
@@ -350,9 +469,4 @@ body.dark #lastUpdated {
   header .darkmode-toggle {
     display: none !important;
   }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
 }

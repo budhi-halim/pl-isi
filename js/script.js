@@ -5,10 +5,12 @@ let debounceTimer;
 
 const PRICE_THRESHOLD = 1000;
 const DEBOUNCE_DELAY = 300;
+const SHOW_DELAY_MS = 160;
 const EXCHANGE_RATE_URL = 'https://budhi-halim.github.io/exchange-rate/data/today.json';
+const LAST_PRODUCTION_URL = 'https://budhi-halim.github.io/general-database/data/last_production.json';
 
 // -------------------------------------------------------------
-// DATA FETCHING (last updated date & exchange rate)
+// DATA FETCHING
 // -------------------------------------------------------------
 async function fetchLastUpdated() {
   try {
@@ -18,36 +20,77 @@ async function fetchLastUpdated() {
     if (!txt) return null;
     const match = txt.match(/^(\d{4})-(\d{2})-(\d{2})/);
     if (match) {
-      const year = match[1];
-      const monthIndex = parseInt(match[2], 10) - 1;
-      const day = parseInt(match[3], 10);
+      const [_, year, month, day] = match;
       const monthNames = [
         "January","February","March","April","May","June",
         "July","August","September","October","November","December"
       ];
-      if (monthIndex >= 0 && monthIndex <= 11) {
-        return `${day} ${monthNames[monthIndex]} ${year}`;
-      }
+      const idx = parseInt(month, 10) - 1;
+      return `${parseInt(day)} ${monthNames[idx]} ${year}`;
     }
     return null;
-  } catch (e) {
+  } catch {
     return null;
   }
 }
 
 async function fetchExchangeRate() {
   try {
-    const response = await fetch(EXCHANGE_RATE_URL);
-    const data = await response.json();
+    const res = await fetch(EXCHANGE_RATE_URL);
+    const data = await res.json();
     return data.tt_counter_selling_rate_buffered;
-  } catch (error) {
-    console.error('Failed to fetch exchange rate:', error);
+  } catch {
     return null;
   }
 }
 
 // -------------------------------------------------------------
-// UTILITY FUNCTIONS
+// LAST PRODUCTION DATA
+// -------------------------------------------------------------
+function normalizeCode(code) {
+  if (!code && code !== 0) return '';
+  return code.toString().replace(/^\*/, '').trim().replace(/\s+/g, ' ');
+}
+
+function formatProductionDate(dateStr) {
+  if (!dateStr) return dateStr;
+  const m = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return dateStr;
+  const year = parseInt(m[1], 10);
+  const month = parseInt(m[2], 10) - 1;
+  const day = parseInt(m[3], 10);
+  const monthNames = [
+    "January","February","March","April","May","June",
+    "July","August","September","October","November","December"
+  ];
+  return `${day} ${monthNames[month]} ${year}`;
+}
+
+async function loadLastProductionMap() {
+  try {
+    const res = await fetch(LAST_PRODUCTION_URL, { cache: "no-store" });
+    if (!res.ok) return new Map();
+    const arr = await res.json();
+    const map = new Map();
+    arr.forEach((item) => {
+      const key = normalizeCode(item.product_code || '').toLowerCase();
+      if (!key) return;
+      const existing = map.get(key);
+      if (!existing) map.set(key, item);
+      else {
+        const d1 = Date.parse(existing.date || '') || 0;
+        const d2 = Date.parse(item.date || '') || 0;
+        if (d2 >= d1) map.set(key, item);
+      }
+    });
+    return map;
+  } catch {
+    return new Map();
+  }
+}
+
+// -------------------------------------------------------------
+//  UTILITIES
 // -------------------------------------------------------------
 function formatWithCommas(str) {
   const parts = str.toString().split('.');
@@ -57,16 +100,15 @@ function formatWithCommas(str) {
 
 // -------------------------------------------------------------
 // MAIN FUNCTION: loadProducts()
-// - Loads product data
-// - Applies filtering & sorting logic
-// - Handles UI interactions (search, price filter, dark mode, etc.)
 // -------------------------------------------------------------
 async function loadProducts() {
   try {
-    let rate = await fetchExchangeRate();
-    const response = await fetch("data/products.json", { cache: "no-store" });
-    const products = await response.json();
-    renderTable(products, rate);
+    const rate = await fetchExchangeRate();
+    const res = await fetch("data/products.json", { cache: "no-store" });
+    const products = await res.json();
+    const lastProductionMap = await loadLastProductionMap();
+
+    renderTable(products, rate, lastProductionMap);
 
     const searchInput = document.getElementById("searchInput");
     const togglePriceFilter = document.getElementById("togglePriceFilter");
@@ -76,109 +118,74 @@ async function loadProducts() {
     const darkModeToggle = document.getElementById("darkModeToggle");
     const darkToggleContainer = document.querySelector(".darkmode-toggle");
 
-    // -------------------------------------------------------------
-    // FILTER FUNCTION
-    // - Applies search text filter
-    // - Applies price range filter when enabled
-    // - Excludes items with price 0 or empty when price filter toggle is active
-    // -------------------------------------------------------------
+    // Filter function
     function applyFilters() {
       const query = (searchInput.value || "").toLowerCase();
       const enablePrice = togglePriceFilter.checked;
       const min = parseFloat(minPrice.value) || 0;
       const max = parseFloat(maxPrice.value) || Infinity;
 
-      let inputs = [];
+      const inputs = [];
       if (minPrice.value.trim() !== '') inputs.push(min);
       if (maxPrice.value.trim() !== '') inputs.push(max);
 
-      // Determine search unit based on input threshold
       let searchUnit = null;
       if (inputs.length > 0) {
         const highest = Math.max(...inputs);
-        searchUnit = (highest >= PRICE_THRESHOLD) ? 'IDR' : 'USD';
+        searchUnit = highest >= PRICE_THRESHOLD ? 'IDR' : 'USD';
       }
 
-      // Apply combined filtering logic
       const filtered = (products || []).filter((p) => {
-        const name = (p.product_name || "").toString().toLowerCase();
-        const code = (p.product_code || "").toString().toLowerCase();
+        const name = (p.product_name || "").toLowerCase();
+        const code = (p.product_code || "").toLowerCase();
         const matchText = name.includes(query) || code.includes(query);
         if (!matchText) return false;
 
         const priceStr = p.marketing_price || "";
         const price = parseFloat(priceStr) || 0;
-
-        // Exclude zero or empty prices when price filter toggle is enabled
-        if (enablePrice && (!priceStr || price === 0)) {
-          return false;
-        }
-
+        if (enablePrice && (!priceStr || price === 0)) return false;
         if (!enablePrice) return true;
+        if (!rate) return price >= min && price <= max;
 
-        // Apply numeric range filtering
-        if (!rate) {
-          return price >= min && price <= max;
-        }
-
-        if (searchUnit === null) {
-          return price >= min && price <= max;
-        }
-
-        const threshold = PRICE_THRESHOLD;
-        const isUSD = price < threshold;
-        let convertedPrice;
-        if (searchUnit === 'USD') {
-          convertedPrice = isUSD ? price : price / rate;
-        } else {
-          convertedPrice = isUSD ? price * rate : price;
-        }
-        return convertedPrice >= min && convertedPrice <= max;
+        const isUSD = price < PRICE_THRESHOLD;
+        let converted;
+        if (searchUnit === 'USD') converted = isUSD ? price : price / rate;
+        else converted = isUSD ? price * rate : price;
+        return converted >= min && converted <= max;
       });
 
-      renderTable(filtered, rate);
+      renderTable(filtered, rate, lastProductionMap);
     }
 
-    // -------------------------------------------------------------
-    // EVENT LISTENERS (search, price filter, scroll, dark mode)
-    // -------------------------------------------------------------
+    // Search and price filter events
     searchInput.addEventListener("input", () => {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(applyFilters, DEBOUNCE_DELAY);
     });
 
     togglePriceFilter.addEventListener("change", () => {
-      document
-        .getElementById("priceRange")
+      document.getElementById("priceRange")
         .classList.toggle("hidden", !togglePriceFilter.checked);
       applyFilters();
     });
 
-    minPrice.addEventListener("input", () => {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(applyFilters, DEBOUNCE_DELAY);
-    });
+    [minPrice, maxPrice].forEach((el) =>
+      el.addEventListener("input", () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(applyFilters, DEBOUNCE_DELAY);
+      })
+    );
 
-    maxPrice.addEventListener("input", () => {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(applyFilters, DEBOUNCE_DELAY);
-    });
-
+    // Scroll-to-top button
     window.addEventListener("scroll", () => {
-      if (window.scrollY > window.innerHeight) {
-        scrollTopBtn.classList.add("show");
-      } else {
-        scrollTopBtn.classList.remove("show");
-      }
+      scrollTopBtn.classList.toggle("show", window.scrollY > window.innerHeight);
     });
 
-    scrollTopBtn.addEventListener("click", () => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
+    scrollTopBtn.addEventListener("click", () =>
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    );
 
-    // -------------------------------------------------------------
-    // DARK MODE HANDLING
-    // -------------------------------------------------------------
+    // Dark mode handling
     const colorSchemeMedia = window.matchMedia("(prefers-color-scheme: dark)");
 
     if (colorSchemeMedia.matches) {
@@ -191,29 +198,28 @@ async function loadProducts() {
 
     function applySystemPreference() {
       const isDark = colorSchemeMedia.matches;
-      const isToggleVisible =
+      const toggleVisible =
         darkToggleContainer &&
         window.getComputedStyle(darkToggleContainer).display !== "none";
 
-      if (!isToggleVisible) {
+      if (!toggleVisible) {
         document.body.classList.toggle("dark", isDark);
         if (darkModeToggle) darkModeToggle.checked = isDark;
       }
     }
 
-    if (colorSchemeMedia.addEventListener) {
+    if (colorSchemeMedia.addEventListener)
       colorSchemeMedia.addEventListener("change", applySystemPreference);
-    } else if (colorSchemeMedia.addListener) {
+    else if (colorSchemeMedia.addListener)
       colorSchemeMedia.addListener(applySystemPreference);
-    }
 
     window.addEventListener("resize", applySystemPreference);
 
-    if (darkModeToggle) {
-      darkModeToggle.addEventListener("change", () => {
-        document.body.classList.toggle("dark", darkModeToggle.checked);
-      });
-    }
+    if (darkModeToggle)
+      darkModeToggle.addEventListener("change", () =>
+        document.body.classList.toggle("dark", darkModeToggle.checked)
+      );
+
   } catch (err) {
     console.error("Failed to load products.json", err);
   }
@@ -221,43 +227,118 @@ async function loadProducts() {
 
 // -------------------------------------------------------------
 // TABLE RENDERING
-// - Renders product list into the HTML table
-// - Converts prices between USD/IDR for display
 // -------------------------------------------------------------
-function renderTable(products, rate) {
+function renderTable(products, rate, lastProductionMap) {
   const tbody = document.querySelector("#productTable tbody");
   const noResults = document.getElementById("noResults");
   tbody.innerHTML = "";
 
+  // Popup creation
+  let popup = document.getElementById("lastProdPopup");
+  if (!popup) {
+    popup = document.createElement("div");
+    popup.id = "lastProdPopup";
+    popup.className = "last-prod-popup";
+    popup.setAttribute("aria-hidden", "true");
+    document.body.appendChild(popup);
+  }
+
+  // Hover interaction state
+  let hoverRow = null;
+  let showTimer = null;
+  let lastMouseMoveTime = 0;
+  let lastMouseX = 0;
+  let lastMouseY = 0;
+
+  // Helpers
+  const clearShowTimer = () => {
+    if (showTimer) {
+      clearTimeout(showTimer);
+      showTimer = null;
+    }
+  };
+
+  const hidePopup = () => {
+    if (!popup) return;
+    popup.classList.add("no-transition");
+    popup.classList.remove("show");
+    popup.setAttribute("aria-hidden", "true");
+    void popup.offsetHeight;
+    popup.classList.remove("no-transition");
+  };
+
+  const showPopupAt = (x, y, html) => {
+    if (!popup) return;
+    popup.innerHTML = html;
+    popup.style.left = `${x}px`;
+    popup.style.top = `${y}px`;
+    popup.classList.add("show");
+    popup.setAttribute("aria-hidden", "false");
+
+    requestAnimationFrame(() => {
+      const rect = popup.getBoundingClientRect();
+      let left = parseFloat(popup.style.left);
+      let top = parseFloat(popup.style.top);
+      if (rect.right > window.innerWidth - 8)
+        left = Math.max(8, left - (rect.right - window.innerWidth) - 8);
+      if (rect.bottom > window.innerHeight - 8)
+        top = Math.max(8, top - (rect.bottom - window.innerHeight) - 8);
+      popup.style.left = `${left}px`;
+      popup.style.top = `${top}px`;
+    });
+  };
+
+  // Global event handlers
+  document.addEventListener("mousemove", (ev) => {
+    lastMouseMoveTime = Date.now();
+    lastMouseX = ev.pageX;
+    lastMouseY = ev.pageY;
+    hidePopup();
+    clearShowTimer();
+    if (hoverRow) {
+      showTimer = setTimeout(() => {
+        if (!hoverRow) return;
+        if (Date.now() - lastMouseMoveTime >= SHOW_DELAY_MS)
+          showPopupAt(lastMouseX, lastMouseY, hoverRow._lastProdContentHtml);
+      }, SHOW_DELAY_MS);
+    }
+  });
+
+  document.addEventListener("click", (ev) => {
+    if (!popup.contains(ev.target)) hidePopup();
+  });
+
+  document.addEventListener(
+    "touchstart",
+    (ev) => {
+      if (!popup.contains(ev.target)) hidePopup();
+    },
+    { passive: true }
+  );
+
+  document.addEventListener("scroll", hidePopup, { passive: true });
+  document.addEventListener("keydown", hidePopup);
+
   if (!products || products.length === 0) {
     noResults.classList.remove("hidden");
     return;
-  } else {
-    noResults.classList.add("hidden");
   }
+  noResults.classList.add("hidden");
 
+  // Render rows and attach handlers
   products.forEach((p, i) => {
     const priceStr = p.marketing_price || "";
     let displayPrice = formatWithCommas(priceStr);
     const price = parseFloat(priceStr);
 
     if (!isNaN(price) && price > 0 && rate) {
-      const threshold = PRICE_THRESHOLD;
-      const isUSD = price < threshold;
-
+      const isUSD = price < PRICE_THRESHOLD;
       if (isUSD) {
-        const idr = price * rate;
-        const ceiledIdr = Math.ceil(idr / 1000) * 1000;
-        const ceiledIdrStr = formatWithCommas(ceiledIdr.toFixed(0));
-        const originalFormatted = formatWithCommas(price.toString());
-        displayPrice = `${originalFormatted} (${ceiledIdrStr})`;
+        const idr = Math.ceil((price * rate) / 1000) * 1000;
+        displayPrice = `${formatWithCommas(price)} (${formatWithCommas(idr)})`;
       } else {
-        const usd = price / rate;
-        const ceiledUsd = Math.ceil(usd * 10) / 10;
-        let usdStr = ceiledUsd.toFixed(1).replace(/\.0$/, '');
-        const usdFormatted = formatWithCommas(usdStr);
-        const originalFormatted = formatWithCommas(price.toString());
-        displayPrice = `${originalFormatted} (${usdFormatted})`;
+        const usd = Math.ceil((price / rate) * 10) / 10;
+        displayPrice = `${formatWithCommas(price)} (${formatWithCommas(usd)})`;
       }
     }
 
@@ -269,19 +350,65 @@ function renderTable(products, rate) {
       <td>${displayPrice}</td>
     `;
     tbody.appendChild(row);
+
+    const code = normalizeCode(p.product_code || "").toLowerCase();
+    const last = lastProductionMap?.get(code);
+    const dateText = last?.date ? formatProductionDate(last.date) : null;
+    const custText = last?.customer || null;
+    const html =
+      dateText || custText
+        ? `<div class="lp-title">Last Production</div>
+           <div class="lp-date">${dateText || "No data"}</div>
+           <div class="lp-customer">${custText || ""}</div>`
+        : `<div class="lp-title">Last Production</div>
+           <div class="lp-none">No data</div>`;
+    row._lastProdContentHtml = html;
+
+    // Mouse hover (desktop)
+    row.addEventListener("mouseenter", (ev) => {
+      hoverRow = row;
+      if (Date.now() - lastMouseMoveTime >= SHOW_DELAY_MS)
+        showPopupAt(ev.pageX, ev.pageY, html);
+      else {
+        clearShowTimer();
+        showTimer = setTimeout(() => {
+          if (!hoverRow) return;
+          if (Date.now() - lastMouseMoveTime >= SHOW_DELAY_MS)
+            showPopupAt(lastMouseX, lastMouseY, html);
+        }, SHOW_DELAY_MS);
+      }
+    });
+
+    row.addEventListener("mouseleave", () => {
+      hoverRow = null;
+      clearShowTimer();
+      hidePopup();
+    });
+
+    // Touch (tap-to-show)
+    row.addEventListener(
+      "touchend",
+      (ev) => {
+        if (ev.changedTouches && ev.changedTouches.length > 0) {
+          const t = ev.changedTouches[0];
+          hidePopup();
+          showPopupAt(t.pageX, t.pageY, html);
+        }
+      },
+      { passive: true }
+    );
   });
 }
 
 // -------------------------------------------------------------
-// INITIALIZATION (runs after DOM is fully loaded)
+// INITIALIZATION
 // -------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", async () => {
-  const lastUpdatedEl = document.getElementById("lastUpdated");
-  const formatted = await fetchLastUpdated();
-  if (formatted && lastUpdatedEl) {
-    lastUpdatedEl.textContent = `Last updated: ${formatted}`;
-  } else if (lastUpdatedEl) {
-    lastUpdatedEl.textContent = "Last updated: Not available";
-  }
+  const el = document.getElementById("lastUpdated");
+  const txt = await fetchLastUpdated();
+  if (el)
+    el.textContent = txt
+      ? `Last updated: ${txt}`
+      : "Last updated: Not available";
   loadProducts();
 });
