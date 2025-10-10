@@ -61,6 +61,9 @@ body {
   font-family: var(--font-family);
   background: var(--color-bg);
   background-image: radial-gradient(circle at top left, rgba(255,255,255,0.2), transparent 70%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
   color: var(--color-text);
   -webkit-tap-highlight-color: transparent;
   transition: all var(--transition-normal);
@@ -71,6 +74,9 @@ body {
 body.dark {
   background: var(--color-bg);
   background-image: radial-gradient(circle at top left, rgba(74,163,216,0.15), transparent 70%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
 }
 
 /* Prevent text selection and touch highlight on long-press */
