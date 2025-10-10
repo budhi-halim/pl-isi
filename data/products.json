@@ -20187,7 +20187,7 @@
   {
     "product_name": "ROASTED CORN SEASONING",
     "product_code": "31603021",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "ROASTED CORN SEASONING",
@@ -24087,6 +24087,16 @@
   {
     "product_name": "SEAWEED SEASONING",
     "product_code": "31301701",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "SEAWEED SEASONING",
+    "product_code": "31301706",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "SEAWEED SEASONING",
+    "product_code": "31301707",
     "marketing_price": ""
   },
   {
