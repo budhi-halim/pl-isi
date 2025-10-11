@@ -88,6 +88,16 @@ body, table, tr, td {
   -webkit-touch-callout: none;
 }
 
+/* Allow text selection only for Product Code cells */
+#productTable tbody td:nth-child(3) {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+  cursor: text;
+}
+
 /* ---------------------------
    Header
    --------------------------- */

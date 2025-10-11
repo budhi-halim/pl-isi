@@ -90,7 +90,7 @@ async function loadLastProductionMap() {
 }
 
 // -------------------------------------------------------------
-//  UTILITIES
+// UTILITIES
 // -------------------------------------------------------------
 function formatWithCommas(str) {
   const parts = str.toString().split('.');
@@ -243,14 +243,12 @@ function renderTable(products, rate, lastProductionMap) {
     document.body.appendChild(popup);
   }
 
-  // Hover interaction state
   let hoverRow = null;
   let showTimer = null;
   let lastMouseMoveTime = 0;
-  let lastMouseX = 0;
-  let lastMouseY = 0;
+  let lastMouseClientX = 0;
+  let lastMouseClientY = 0;
 
-  // Helpers
   const clearShowTimer = () => {
     if (showTimer) {
       clearTimeout(showTimer);
@@ -267,41 +265,96 @@ function renderTable(products, rate, lastProductionMap) {
     popup.classList.remove("no-transition");
   };
 
-  const showPopupAt = (x, y, html) => {
+  // Show popup at coordinates, prefer below the point but place above if not enough space
+  function showPopupAt(x, y, html, isClient = false) {
     if (!popup) return;
     popup.innerHTML = html;
-    popup.style.left = `${x}px`;
-    popup.style.top = `${y}px`;
-    popup.classList.add("show");
-    popup.setAttribute("aria-hidden", "false");
 
-    requestAnimationFrame(() => {
-      const rect = popup.getBoundingClientRect();
-      let left = parseFloat(popup.style.left);
-      let top = parseFloat(popup.style.top);
-      if (rect.right > window.innerWidth - 8)
-        left = Math.max(8, left - (rect.right - window.innerWidth) - 8);
-      if (rect.bottom > window.innerHeight - 8)
-        top = Math.max(8, top - (rect.bottom - window.innerHeight) - 8);
-      popup.style.left = `${left}px`;
-      popup.style.top = `${top}px`;
-    });
-  };
+    // Determine client coordinates
+    const clientX = isClient ? x : x - window.scrollX;
+    const clientY = isClient ? y : y - window.scrollY;
+    const margin = 8;
 
-  // Global event handlers
+    // Prepare initial invisible placement so we can measure
+    popup.style.left = `${clientX + window.scrollX}px`;
+    popup.style.top = `${clientY + window.scrollY}px`;
+    popup.style.visibility = 'hidden';
+
+    // Temporarily add show to allow accurate measurement of final size/transform
+    popup.classList.add('show');
+    const rect = popup.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+
+    // Decide vertical placement: prefer below, fallback above, otherwise clamp center
+    const spaceBelow = window.innerHeight - clientY - margin;
+    const spaceAbove = clientY - margin;
+    let finalClientTop;
+    if (spaceBelow >= height) {
+      finalClientTop = clientY;
+    } else if (spaceAbove >= height) {
+      finalClientTop = Math.max(margin, clientY - height);
+    } else {
+      // not enough space either side: clamp so popup fits in viewport
+      if (spaceBelow >= spaceAbove) {
+        finalClientTop = Math.max(margin, window.innerHeight - margin - height);
+      } else {
+        finalClientTop = margin;
+      }
+    }
+
+    // Horizontal placement: clamp within viewport
+    let finalClientLeft = clientX;
+    if (finalClientLeft + width > window.innerWidth - margin) {
+      finalClientLeft = Math.max(margin, window.innerWidth - margin - width);
+    }
+    if (finalClientLeft < margin) finalClientLeft = margin;
+
+    // Convert to page coords and set
+    const pageLeft = finalClientLeft + window.scrollX;
+    const pageTop = finalClientTop + window.scrollY;
+    popup.style.left = `${pageLeft}px`;
+    popup.style.top = `${pageTop}px`;
+
+    // Reveal
+    popup.style.visibility = '';
+    popup.setAttribute('aria-hidden', 'false');
+    popup.classList.add('show');
+  }
+
+  // Helper: find a table row under client coordinates
+  function getRowFromPoint(clientX, clientY) {
+    // elementFromPoint works in client coords
+    const el = document.elementFromPoint(clientX, clientY);
+    if (!el || !el.closest) return null;
+    return el.closest("#productTable tbody tr");
+  }
+
+  // Global mousemove: update movement timestamp, detect row under pointer via elementFromPoint,
+  // hide popup on motion and schedule show only if pointer is over a valid row.
   document.addEventListener("mousemove", (ev) => {
     lastMouseMoveTime = Date.now();
-    lastMouseX = ev.pageX;
-    lastMouseY = ev.pageY;
+    lastMouseClientX = ev.clientX;
+    lastMouseClientY = ev.clientY;
+
+    const possibleRow = getRowFromPoint(ev.clientX, ev.clientY);
+    if (!possibleRow) {
+      hoverRow = null;
+      hidePopup();
+      clearShowTimer();
+      return;
+    }
+
+    // pointer is over a row; schedule show after stationary period
+    hoverRow = possibleRow;
     hidePopup();
     clearShowTimer();
-    if (hoverRow) {
-      showTimer = setTimeout(() => {
-        if (!hoverRow) return;
-        if (Date.now() - lastMouseMoveTime >= SHOW_DELAY_MS)
-          showPopupAt(lastMouseX, lastMouseY, hoverRow._lastProdContentHtml);
-      }, SHOW_DELAY_MS);
-    }
+    showTimer = setTimeout(() => {
+      if (!hoverRow) return;
+      if (Date.now() - lastMouseMoveTime >= SHOW_DELAY_MS) {
+        showPopupAt(lastMouseClientX, lastMouseClientY, hoverRow._lastProdContentHtml, true);
+      }
+    }, SHOW_DELAY_MS);
   });
 
   document.addEventListener("click", (ev) => {
@@ -325,7 +378,7 @@ function renderTable(products, rate, lastProductionMap) {
   }
   noResults.classList.add("hidden");
 
-  // Render rows and attach handlers
+  // Render rows
   products.forEach((p, i) => {
     const priceStr = p.marketing_price || "";
     let displayPrice = formatWithCommas(priceStr);
@@ -368,13 +421,13 @@ function renderTable(products, rate, lastProductionMap) {
     row.addEventListener("mouseenter", (ev) => {
       hoverRow = row;
       if (Date.now() - lastMouseMoveTime >= SHOW_DELAY_MS)
-        showPopupAt(ev.pageX, ev.pageY, html);
+        showPopupAt(ev.clientX, ev.clientY, html, true);
       else {
         clearShowTimer();
         showTimer = setTimeout(() => {
           if (!hoverRow) return;
           if (Date.now() - lastMouseMoveTime >= SHOW_DELAY_MS)
-            showPopupAt(lastMouseX, lastMouseY, html);
+            showPopupAt(lastMouseClientX, lastMouseClientY, html, true);
         }, SHOW_DELAY_MS);
       }
     });
@@ -406,9 +459,6 @@ function renderTable(products, rate, lastProductionMap) {
 document.addEventListener("DOMContentLoaded", async () => {
   const el = document.getElementById("lastUpdated");
   const txt = await fetchLastUpdated();
-  if (el)
-    el.textContent = txt
-      ? `Last updated: ${txt}`
-      : "Last updated: Not available";
+  if (el) el.textContent = txt ? `Last updated: ${txt}` : "Last updated: Not available";
   loadProducts();
 });
