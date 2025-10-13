@@ -3061,6 +3061,16 @@
   },
   {
     "product_name": "BBQ SEASONING",
+    "product_code": "31407962",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "BBQ SEASONING",
+    "product_code": "31407963",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "BBQ SEASONING",
     "product_code": "D-108",
     "marketing_price": "3.5"
   },
@@ -7652,7 +7662,7 @@
   {
     "product_name": "CHICKEN SEASONING",
     "product_code": "31103065",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "CHICKEN SEASONING",
@@ -15010,7 +15020,7 @@
     "marketing_price": ""
   },
   {
-    "product_name": "Kecap asin seasoning / SPI KCA I 176 I",
+    "product_name": "Kecap asin seasoning / PREMIX FOOD SPI KCA I 176 I",
     "product_code": "31700402",
     "marketing_price": "6.45"
   },
@@ -15552,6 +15562,16 @@
   {
     "product_name": "MARINATION SEASONING",
     "product_code": "31407956",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "MARINATION SEASONING",
+    "product_code": "31407964",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "MARINATION SEASONING",
+    "product_code": "31407965",
     "marketing_price": ""
   },
   {
@@ -20237,6 +20257,11 @@
   {
     "product_name": "ROASTED CORN SEASONING",
     "product_code": "31603045",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "ROASTED CORN SEASONING",
+    "product_code": "31603053",
     "marketing_price": ""
   },
   {
@@ -29002,6 +29027,11 @@
   {
     "product_name": "TTEOKBOKKI SEASONING",
     "product_code": "31407950",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "TTEOKBOKKI SEASONING",
+    "product_code": "31407966",
     "marketing_price": ""
   },
   {
