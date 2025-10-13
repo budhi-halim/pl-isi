@@ -2240,11 +2240,6 @@
     "marketing_price": "6.75"
   },
   {
-    "product_name": "BBEF OIL",
-    "product_code": "35200023",
-    "marketing_price": ""
-  },
-  {
     "product_name": "BBQ",
     "product_code": "C-001",
     "marketing_price": "2.70"
@@ -3402,6 +3397,11 @@
   {
     "product_name": "BEEF OIL",
     "product_code": "35200022",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "BEEF OIL",
+    "product_code": "35200023",
     "marketing_price": ""
   },
   {
@@ -14955,6 +14955,11 @@
     "marketing_price": ""
   },
   {
+    "product_name": "KOREAN SPICY NOODLE PASTE",
+    "product_code": "34400474",
+    "marketing_price": ""
+  },
+  {
     "product_name": "KOYA POWDER",
     "product_code": "31802534",
     "marketing_price": ""
@@ -15020,7 +15025,7 @@
     "marketing_price": ""
   },
   {
-    "product_name": "Kecap asin seasoning / PREMIX FOOD SPI KCA I 176 I",
+    "product_name": "Kecap asin seasoning / PREMIX FOOD SPI KCA 176 I",
     "product_code": "31700402",
     "marketing_price": "6.45"
   },
@@ -15308,6 +15313,11 @@
     "product_name": "MALA PASTE",
     "product_code": "34400428",
     "marketing_price": "14.0"
+  },
+  {
+    "product_name": "MALA PASTE",
+    "product_code": "34400475",
+    "marketing_price": ""
   },
   {
     "product_name": "MALA SEASONING",
@@ -20762,6 +20772,11 @@
   {
     "product_name": "ROSE SEASONING",
     "product_code": "31407373",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "ROSE TTEOKBOKKI PASTE",
+    "product_code": "34400476",
     "marketing_price": ""
   },
   {
