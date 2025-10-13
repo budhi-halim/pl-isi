@@ -19,7 +19,7 @@ PRODUCT_URL = "http://apps.islandsunindonesia.com:81/islandsun/samplerequest/get
 PRICE_URL = "http://apps.islandsunindonesia.com:81/islandsun/samplerequest/getMarketingPrice"
 
 # Maximum worker threads for HTTP requests
-MAX_WORKERS: int = 15
+MAX_WORKERS: int = 32
 
 
 def _parse_code_and_name(text: str) -> tuple[str, str]:
@@ -78,7 +78,7 @@ def collect_full_catalog(session: requests.Session) -> list[dict]:
 
     print("[CATALOG] Collecting products...")
     # Use thread pool to parallelize blocking HTTP calls
-    with ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         future_to_term = {executor.submit(_fetch_products_for_term_blocking, session, term): term for term in terms}
         completed = 0
         for future in as_completed(future_to_term):
@@ -125,7 +125,7 @@ def enrich_with_prices(session: requests.Session, catalog: list[dict]) -> list[d
             unique_ids.append(pid)
 
     # Parallel fetch prices for unique ids
-    with ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         future_to_pid = {executor.submit(_fetch_price_blocking, session, pid): pid for pid in unique_ids}
         for future in as_completed(future_to_pid):
             pid = future_to_pid[future]
