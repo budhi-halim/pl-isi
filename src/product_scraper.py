@@ -66,7 +66,7 @@ def _fetch_products_for_term_blocking(session: requests.Session, term: str) -> l
         return []
 
 
-def collect_full_catalog(session: requests.Session) -> List[dict]:
+def collect_full_catalog(session: requests.Session) -> list[dict]:
     """
     Collect full catalog using a ThreadPoolExecutor to parallelize term lookups.
     Preserves original deduplication logic and status messages.
@@ -78,7 +78,7 @@ def collect_full_catalog(session: requests.Session) -> List[dict]:
 
     print("[CATALOG] Collecting products...")
     # Use thread pool to parallelize blocking HTTP calls
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+    with ThreadPoolExecutor() as executor:
         future_to_term = {executor.submit(_fetch_products_for_term_blocking, session, term): term for term in terms}
         completed = 0
         for future in as_completed(future_to_term):
@@ -106,13 +106,13 @@ def _fetch_price_blocking(session: requests.Session, pid: str) -> str:
     return ""
 
 
-def enrich_with_prices(session: requests.Session, catalog: List[dict]) -> List[dict]:
+def enrich_with_prices(session: requests.Session, catalog: list[dict]) -> list[dict]:
     """
     Enrich catalog entries with prices. Uses in-memory cache id_to_price to avoid duplicate requests.
     Uses ThreadPoolExecutor to parallelize price queries when beneficial.
     """
     id_to_price: dict[str, str] = {}
-    enriched: List[dict] = []
+    enriched: list[dict] = []
     total = len(catalog)
     print("[PRICES] Fetching marketing prices...")
 
@@ -125,7 +125,7 @@ def enrich_with_prices(session: requests.Session, catalog: List[dict]) -> List[d
             unique_ids.append(pid)
 
     # Parallel fetch prices for unique ids
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+    with ThreadPoolExecutor() as executor:
         future_to_pid = {executor.submit(_fetch_price_blocking, session, pid): pid for pid in unique_ids}
         for future in as_completed(future_to_pid):
             pid = future_to_pid[future]
@@ -150,7 +150,7 @@ def enrich_with_prices(session: requests.Session, catalog: List[dict]) -> List[d
     return enriched
 
 
-def save_json(products: List[dict]) -> List[dict]:
+def save_json(products: list[dict]) -> list[dict]:
     """Save products.json with same formatting and return sorted products."""
     products_sorted = sorted(products, key=lambda x: (x["product_name"], x["product_code"]))
     os.makedirs("data", exist_ok=True)
