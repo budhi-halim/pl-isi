@@ -120,7 +120,12 @@ async function loadProducts() {
 
     // Filter function
     function applyFilters() {
-      const query = (searchInput.value || "").toLowerCase();
+      const queryRaw = (searchInput.value || "").toLowerCase();
+      const queryTerms = queryRaw
+        .split(",")
+        .map((t) => t.trim())
+        .filter((t) => t.length > 0);
+
       const enablePrice = togglePriceFilter.checked;
       const min = parseFloat(minPrice.value) || 0;
       const max = parseFloat(maxPrice.value) || Infinity;
@@ -138,7 +143,7 @@ async function loadProducts() {
       const filtered = (products || []).filter((p) => {
         const name = (p.product_name || "").toLowerCase();
         const code = (p.product_code || "").toLowerCase();
-        const matchText = name.includes(query) || code.includes(query);
+        const matchText = queryTerms.length === 0 || queryTerms.some(q => name.includes(q) || code.includes(q));
         if (!matchText) return false;
 
         const priceStr = p.marketing_price || "";
