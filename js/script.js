@@ -120,11 +120,8 @@ async function loadProducts() {
 
     // Filter function
     function applyFilters() {
-      const queryRaw = (searchInput.value || "").toLowerCase();
-      const queryTerms = queryRaw
-        .split(",")
-        .map((t) => t.trim())
-        .filter((t) => t.length > 0);
+      const rawQuery = searchInput.value || "";
+      const query = rawQuery.trim().replace(/\s+/g, " ").toLowerCase();
 
       const enablePrice = togglePriceFilter.checked;
       const min = parseFloat(minPrice.value) || 0;
@@ -140,12 +137,135 @@ async function loadProducts() {
         searchUnit = highest >= PRICE_THRESHOLD ? 'IDR' : 'USD';
       }
 
+      // -------------------------------------------------------------
+      // EXACT COPY: HELPERS from your short code
+      // -------------------------------------------------------------
+      /**
+       * Split string by top-level OR tokens (' or ' case-insensitive) and commas,
+       * but do NOT split when inside parentheses. Returns trimmed parts.
+       */
+      function splitTopLevel(q) {
+        const parts = [];
+        let cur = "";
+        let depth = 0;
+        for (let i = 0; i < q.length; i++) {
+          const ch = q[i];
+
+          if (ch === "(") {
+            depth++;
+            cur += ch;
+            continue;
+          }
+          if (ch === ")") {
+            depth = Math.max(0, depth - 1);
+            cur += ch;
+            continue;
+          }
+
+          // detect " or " (with spaces) only at depth 0
+          if (depth === 0 && i + 4 <= q.length && q.slice(i, i + 4) === " or ") {
+            parts.push(cur.trim());
+            cur = "";
+            i += 3;
+            continue;
+          }
+
+          // detect comma at depth 0
+          if (depth === 0 && ch === ",") {
+            parts.push(cur.trim());
+            cur = "";
+            continue;
+          }
+
+          cur += ch;
+        }
+        if (cur.trim() !== "") parts.push(cur.trim());
+        return parts;
+      }
+
+      // -------------------------------------------------------------
+      // EXACT COPY: SEARCH LOGIC from your short code
+      // -------------------------------------------------------------
+      const contains = (itemLower, term) => itemLower.includes(term);
+
+      function matchesSingleQuery(item, q) {
+        const itemLower = item.toLowerCase();
+
+        // Handle parentheses recursively
+        const parenRegex = /\(([^()]+)\)/;
+        const parenMatch = q.match(parenRegex);
+        if (parenMatch) {
+          const inner = parenMatch[1];
+
+          // Split inner by OR/comma
+          const innerParts = splitTopLevel(inner);
+          let expandedQueries = [];
+
+          for (const part of innerParts) {
+            // Replace the parentheses with each option
+            expandedQueries.push(q.replace(parenRegex, part.trim()));
+          }
+
+          // OR relationship between innerParts
+          return expandedQueries.some((subQ) => matchesSingleQuery(item, subQ));
+        }
+
+        // Handle NOT + (A AND B) pattern explicitly
+        const notParenPattern = /not\s*\(([^()]+)\)/i;
+        const notParenMatch = q.match(notParenPattern);
+        if (notParenMatch) {
+          const inner = notParenMatch[1];
+          const innerAndParts = inner.split(/\s+and\s+/i).map((s) => s.trim());
+          const transformedQueries = innerAndParts.map(
+            (p) => q.replace(notParenPattern, `not ${p}`)
+          );
+          return transformedQueries.some((subQ) => matchesSingleQuery(item, subQ));
+        }
+
+        // Split by NOT
+        const notSplit = q.split(/\s+not\s+/i);
+        const includePart = notSplit[0].trim();
+        const excludePart = notSplit[1] ? notSplit[1].trim() : "";
+
+        const includeTerms =
+          includePart === ""
+            ? []
+            : includePart.split(/\s+and\s+/i).map((s) => s.trim()).filter(Boolean);
+
+        const excludeTerms =
+          excludePart === ""
+            ? []
+            : excludePart.split(/\s+and\s+/i).map((s) => s.trim()).filter(Boolean);
+
+        const includeOK =
+          includeTerms.length === 0
+            ? true
+            : includeTerms.every((term) => contains(itemLower, term));
+
+        const excludeOK = excludeTerms.every((term) => !contains(itemLower, term));
+
+        return includeOK && excludeOK;
+      }
+
+      // -------------------------------------------------------------
+      // MAIN FILTER: EXACT INTEGRATION
+      // -------------------------------------------------------------
       const filtered = (products || []).filter((p) => {
         const name = (p.product_name || "").toLowerCase();
         const code = (p.product_code || "").toLowerCase();
-        const matchText = queryTerms.length === 0 || queryTerms.some(q => name.includes(q) || code.includes(q));
-        if (!matchText) return false;
+        const searchableText = `${name} ${code}`;  // Combined for search, like your 'item'
 
+        // === EXACT SEARCH APPLICATION ===
+        let matchesSearch = true;
+        if (query) {  // Non-empty query: apply full logic
+          const orParts = splitTopLevel(query);
+          matchesSearch = orParts.some((part) => matchesSingleQuery(searchableText, part));
+        }
+        // Empty query: matchesSearch remains true (show all)
+
+        if (!matchesSearch) return false;  // Fail search → reject (exact like your filter)
+
+        // === PRICE FILTER LOGIC (UNCHANGED, EXACT COPY) ===
         const priceStr = p.marketing_price || "";
         const price = parseFloat(priceStr) || 0;
         if (enablePrice && (!priceStr || price === 0)) return false;
