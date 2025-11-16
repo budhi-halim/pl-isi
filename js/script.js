@@ -1,7 +1,7 @@
 // -------------------------------------------------------------
 // IMPORTS
 // -------------------------------------------------------------
-import { searchStrings } from "./advanced_search.js";
+import { ParseError, searchStrings } from "./advanced_search.js";
 
 // -------------------------------------------------------------
 // CONSTANTS / CONFIGURATION
@@ -142,30 +142,44 @@ async function loadProducts() {
         searchUnit = highest >= PRICE_THRESHOLD ? 'IDR' : 'USD';
       }
 
-      const filtered = (products || []).filter((p) => {
-        // Filter using searchStrings function
-        const searchableText = `${p.product_name || ""} ${p.product_code || ""}`.trim();
-        const searchResults = searchStrings(query, [searchableText]);
-        const matchesSearch = searchResults.length > 0;
+      let queryIsInvalid = false;
 
-        // Empty query: matchesSearch remains true (show all)
-        if (!matchesSearch) return false;
+      let filtered = [];
+        try {
+          filtered = (products || []).filter((p) => {
+            const searchableText = `${p.product_name || ""} ${p.product_code || ""}`.trim();
 
-        // Price filter logic
-        const priceStr = p.marketing_price || "";
-        const price = parseFloat(priceStr) || 0;
-        if (enablePrice && (!priceStr || price === 0)) return false;
-        if (!enablePrice) return true;
-        if (!rate) return price >= min && price <= max;
+            const searchResults = searchStrings(query, [searchableText]);
+            const matchesSearch = searchResults.length > 0;
 
-        const isUSD = price < PRICE_THRESHOLD;
-        let converted;
-        if (searchUnit === 'USD') converted = isUSD ? price : price / rate;
-        else converted = isUSD ? price * rate : price;
-        return converted >= min && converted <= max;
-      });
+            if (!matchesSearch) return false;
 
-      renderTable(filtered, rate, lastProductionMap);
+            const priceStr = p.marketing_price || "";
+            const price = parseFloat(priceStr) || 0;
+
+            if (enablePrice && (!priceStr || price === 0)) return false;
+            if (!enablePrice) return true;
+
+            if (!rate) return price >= min && price <= max;
+
+            const isUSD = price < PRICE_THRESHOLD;
+            let converted;
+            if (searchUnit === 'USD') converted = isUSD ? price : price / rate;
+            else converted = isUSD ? price * rate : price;
+
+            return converted >= min && converted <= max;
+          });
+
+        } catch (err) {
+          if (err instanceof ParseError) {
+            queryIsInvalid = true;
+            filtered = []; // ensure empty results so renderTable receives []
+          } else {
+            throw err;
+          }
+        }
+
+      renderTable(filtered, rate, lastProductionMap, queryIsInvalid);
     }
 
     // Search and price filter events
@@ -239,9 +253,10 @@ async function loadProducts() {
 // -------------------------------------------------------------
 // TABLE RENDERING
 // -------------------------------------------------------------
-function renderTable(products, rate, lastProductionMap) {
+function renderTable(products, rate, lastProductionMap, queryIsInvalid = false) {
   const tbody = document.querySelector("#productTable tbody");
   const noResults = document.getElementById("noResults");
+  const invalidQuery = document.getElementById("invalidQuery");
   tbody.innerHTML = "";
 
   // Popup creation
@@ -383,10 +398,20 @@ function renderTable(products, rate, lastProductionMap) {
   document.addEventListener("scroll", hidePopup, { passive: true });
   document.addEventListener("keydown", hidePopup);
 
+  if (queryIsInvalid) {
+    invalidQuery.classList.remove("hidden");
+    noResults.classList.add("hidden");
+    return;
+  } else {
+    invalidQuery.classList.add("hidden");
+  }
+
+  // No results but query is valid
   if (!products || products.length === 0) {
     noResults.classList.remove("hidden");
     return;
   }
+
   noResults.classList.add("hidden");
 
   // Render rows

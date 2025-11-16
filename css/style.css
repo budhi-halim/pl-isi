@@ -313,7 +313,7 @@ tbody tr:hover {
 }
 
 /* no results */
-#noResults {
+.emptyTable {
   margin-top: var(--spacing-lg);
   text-align: center;
   font-size: 1.1rem;

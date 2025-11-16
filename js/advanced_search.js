@@ -2,18 +2,9 @@
 // Constants
 // -------------------------------------------------------------
 /**
- * NO_RESULT is an empty array of query objects.
- * Each query object has shape: { include: [...], exclude: [...] }
- * We use an array because top-level queries (split by OR/comma) produce multiple objects.
+ * NO_RESULT is an empty array returned when a *valid* query matches nothing.
  */
 const NO_RESULT = [];
-
-/**
- * INVALID_QUERY is an empty array returned when the input query is malformed
- * (e.g., unbalanced parentheses, nested parentheses, or other syntax errors).
- * It signals to the caller that no valid filtering should be performed.
- */
-const INVALID_QUERY = [];
 
 /**
  * MATCH_ALL is a single query object that matches **every** item.
@@ -23,14 +14,29 @@ const INVALID_QUERY = [];
 const MATCH_ALL = [{ include: ["*"], exclude: [] }];
 
 // -------------------------------------------------------------
+// ParseError – thrown for any malformed query
+// -------------------------------------------------------------
+/**
+ * Error thrown when a search query cannot be parsed.
+ * @extends Error
+ */
+class ParseError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'ParseError';
+  }
+}
+
+// -------------------------------------------------------------
 // 1) Parenthesis validator (classic stack algorithm)
 // Returns true if parentheses are properly ordered and balanced.
 // -------------------------------------------------------------
 /**
  * Validates that parentheses in the query string are balanced.
  *
- * @param {string} query - The raw search query string.
- * @returns {boolean} `true` if parentheses are balanced, `false` otherwise.
+ * @param {string} query - The query string (already whitespace-normalised).
+ * @throws {ParseError} If parentheses are unbalanced.
+ * @returns {void}
  */
 function isParenthesisValid(query) {
   const stack = [];
@@ -39,11 +45,15 @@ function isParenthesisValid(query) {
     if (ch === "(") {
       stack.push(ch);
     } else if (ch === ")") {
-      if (stack.length === 0) return false; // closing before opening
+      if (stack.length === 0) {
+        throw new ParseError("Unbalanced parentheses – extra closing ')'");
+      }
       stack.pop();
     }
   }
-  return stack.length === 0;
+  if (stack.length !== 0) {
+    throw new ParseError("Unbalanced parentheses – missing closing ')'");
+  }
 }
 
 // -------------------------------------------------------------
@@ -61,7 +71,7 @@ function isParenthesisValid(query) {
 function splitTopLevel(rawQ) {
   if (!rawQ) return [];
 
-  const q = rawQ.trim();
+  const q = rawQ;
   const parts = [];
   let cur = "";
   let depth = 0;
@@ -138,7 +148,7 @@ function isAlphaNum(ch) {
 function splitByAndNotLevel0(rawPart) {
   if (!rawPart) return [];
 
-  const q = rawPart.trim();
+  const q = rawPart;
   const tokens = [];
   let cur = "";
   let depth = 0;
@@ -342,18 +352,26 @@ function extractAllTermsFromParenthesis(s) {
  *
  * @param {string} rawQuery - The raw search query.
  * @returns {Array<{include: string[], exclude: string[]}>} Array of query objects.
- *          Returns `MATCH_ALL` if query is empty or `INVALID_QUERY` if malformed.
+ *          Returns `MATCH_ALL` if the query is empty/whitespace.
+ *          Returns `NO_RESULT` (`[]`) when a *valid* query matches nothing.
+ * @throws {ParseError} If the query syntax is invalid (unbalanced parens,
+ *                      nested parens, stray operators, etc.).
  */
 function parseQuery(rawQuery) {
   if (!rawQuery || typeof rawQuery !== "string") return MATCH_ALL;
 
+  // Query preprocessing
+  let query = rawQuery
+    .trim()                                 // initial trim
+    .replace(/\s+/g, " ")                   // collapse spaces
+    .replace(/ AND NOT /gi, " NOT ")        // semantic rule: "AND NOT" == "NOT"
+    .trim();                                // final trim
+
   // Quick parentheses validation
-  if (!isParenthesisValid(rawQuery)) {
-    return INVALID_QUERY;
-  }
+  isParenthesisValid(query); // throws ParseError if unbalanced
 
   // Split top-level by OR/commas (these produce separate query objects)
-  const topParts = splitTopLevel(rawQuery);
+  const topParts = splitTopLevel(query);
 
   const queries = [];
 
@@ -428,7 +446,7 @@ function parseQuery(rawQuery) {
 
           // Nested parenthesis check: if inner contains '(' or ')' it's nested -> invalid per your rule
           if (inner.includes("(") || inner.includes(")")) {
-            return NO_RESULT; // invalid nested parentheses
+            throw new ParseError("Nested parentheses are not allowed");
           }
 
           // Special rule: parentheses after AND are processed by splitting by top-level AND inside the parentheses
@@ -489,7 +507,7 @@ function parseQuery(rawQuery) {
           const inner = nt.slice(1, -1).trim();
           // reject nested parentheses inside -> invalid
           if (inner.includes("(") || inner.includes(")")) {
-            return NO_RESULT;
+            throw new ParseError("Nested parentheses are not allowed");
           }
           const allTerms = extractAllTermsFromParenthesis(nt);
           for (const p of partials) {
@@ -534,12 +552,11 @@ function parseQuery(rawQuery) {
 
 /**
  * Filters an array of strings based on a search query.
- * Uses `parseQuery` internally to interpret include/exclude logic.
  *
  * @param {string} query - The search query.
  * @param {string[]} items - Array of strings to filter.
- * @returns {string[]} Filtered array of strings that match the query.
- *                    Returns empty array if query is invalid or no matches.
+ * @returns {string[]} Filtered array – `[]` means **no match**, never an error.
+ * @throws {ParseError} If the query syntax is invalid.
  */
 function searchStrings(query, items) {
   // empty data
@@ -547,9 +564,6 @@ function searchStrings(query, items) {
 
   // parse
   const parsed = parseQuery(query);
-
-  // invalid syntax
-  if (parsed === INVALID_QUERY) return INVALID_QUERY;
 
   // filter
   return items.filter(item => {
@@ -572,12 +586,12 @@ function searchStrings(query, items) {
 
 /**
  * Filters an array of objects by searching within a specific key.
- * Uses the same query logic as `searchStrings`.
  *
  * @param {string} query - The search query.
  * @param {Object[]} items - Array of objects to filter.
- * @param {string} key - The object key to search within (e.g., 'name', 'title').
- * @returns {Object[]} Filtered array of objects matching the query.
+ * @param {string} key - The object key to search within.
+ * @returns {Object[]} Filtered array – `[]` means **no match**.
+ * @throws {ParseError} If the query syntax is invalid.
  */
 function searchObjects(query, items, key) {
   // empty data or invalid key
@@ -585,9 +599,6 @@ function searchObjects(query, items, key) {
 
   // parse
   const parsed = parseQuery(query);
-
-  // invalid syntax
-  if (parsed === INVALID_QUERY) return [];
 
   // filter
   return items.filter(item => {
@@ -616,5 +627,6 @@ function searchObjects(query, items, key) {
 export { 
   parseQuery, 
   searchStrings, 
-  searchObjects 
+  searchObjects,
+  ParseError
 };
