@@ -160,6 +160,11 @@
     "marketing_price": ""
   },
   {
+    "product_name": "ALMAZ FRIED CHICKEN SEASONING",
+    "product_code": "31103077",
+    "marketing_price": ""
+  },
+  {
     "product_name": "AMINO ACID POWDER",
     "product_code": "31700431",
     "marketing_price": "0"
@@ -1367,6 +1372,11 @@
   {
     "product_name": "BALADO PADANG SEASONING",
     "product_code": "31407910",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "BALADO PADANG SEASONING",
+    "product_code": "31408009",
     "marketing_price": ""
   },
   {
@@ -3122,6 +3132,11 @@
   {
     "product_name": "BBQ SEASONING",
     "product_code": "31407997",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "BBQ SEASONING",
+    "product_code": "31408011",
     "marketing_price": ""
   },
   {
@@ -16685,6 +16700,11 @@
     "marketing_price": "0"
   },
   {
+    "product_name": "MINYAK BAWANG MERAH",
+    "product_code": "38800015",
+    "marketing_price": ""
+  },
+  {
     "product_name": "MIX HERBS NACHO SEASONING",
     "product_code": "31406978",
     "marketing_price": "0"
@@ -21535,6 +21555,11 @@
     "marketing_price": ""
   },
   {
+    "product_name": "SAMBAL BAKAR SEASONING",
+    "product_code": "31408010",
+    "marketing_price": ""
+  },
+  {
     "product_name": "SAMBAL BAKSO PASTE",
     "product_code": "34400422",
     "marketing_price": "4.6"
@@ -21722,6 +21747,16 @@
   {
     "product_name": "SAMBAL BALADO KUNING SEASONING",
     "product_code": "31408004",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "SAMBAL BALADO KUNING SEASONING",
+    "product_code": "31408014",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "SAMBAL BALADO KUNING SEASONING",
+    "product_code": "31408015",
     "marketing_price": ""
   },
   {
@@ -22567,11 +22602,16 @@
   {
     "product_name": "SAMBAL BALADO SEASONING",
     "product_code": "31407982",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "SAMBAL BALADO SEASONING",
     "product_code": "31408006",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "SAMBAL BALADO SEASONING",
+    "product_code": "31408012",
     "marketing_price": ""
   },
   {
@@ -26397,6 +26437,11 @@
   {
     "product_name": "SPICY CURRY SEASONING",
     "product_code": "31407912",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "SPICY CURRY SEASONING",
+    "product_code": "31408013",
     "marketing_price": ""
   },
   {
