@@ -9506,16 +9506,6 @@
   },
   {
     "product_name": "CORN BBQ SEASONING",
-    "product_code": "31602293",
-    "marketing_price": "3.5"
-  },
-  {
-    "product_name": "CORN BBQ SEASONING",
-    "product_code": "31602751",
-    "marketing_price": ""
-  },
-  {
-    "product_name": "CORN BBQ SEASONING",
     "product_code": "31602821",
     "marketing_price": "6.85"
   },
@@ -30382,7 +30372,7 @@
   {
     "product_name": "YOGHURT SEASONING",
     "product_code": "31503205",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "YOGURT SEASONING",
