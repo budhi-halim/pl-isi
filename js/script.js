@@ -13,6 +13,10 @@ const DEBOUNCE_DELAY = 300;
 const SHOW_DELAY_MS = 160;
 const EXCHANGE_RATE_URL = 'https://budhi-halim.github.io/exchange-rate/data/today.json';
 const LAST_PRODUCTION_URL = 'https://budhi-halim.github.io/general-database/data/last_production.json';
+const PRODUCT_TAGS_URL = 'data/product_tags.json';
+
+const COPY_SVG = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6" /></svg>`;
+const CHECK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>`;
 
 // -------------------------------------------------------------
 // DATA FETCHING
@@ -50,7 +54,7 @@ async function fetchExchangeRate() {
 }
 
 // -------------------------------------------------------------
-// LAST PRODUCTION DATA
+// LAST PRODUCTION & TAG DATA
 // -------------------------------------------------------------
 function normalizeCode(code) {
   if (!code && code !== 0) return '';
@@ -94,6 +98,28 @@ async function loadLastProductionMap() {
   }
 }
 
+async function loadProductTagsData() {
+  try {
+    const res = await fetch(PRODUCT_TAGS_URL, { cache: "no-store" });
+    if (!res.ok) return { map: new Map(), rawList: [] };
+    const arr = await res.json();
+    const map = new Map();
+    const rawList = arr.map(t => t.tag.toLowerCase());
+
+    arr.forEach(tagGroup => {
+      const { tag, icon, products } = tagGroup;
+      products.forEach(pCode => {
+        const code = normalizeCode(pCode).toLowerCase();
+        if (!map.has(code)) map.set(code, []);
+        map.get(code).push({ tag, icon });
+      });
+    });
+    return { map, rawList };
+  } catch {
+    return { map: new Map(), rawList: [] };
+  }
+}
+
 // -------------------------------------------------------------
 // UTILITIES
 // -------------------------------------------------------------
@@ -112,8 +138,11 @@ async function loadProducts() {
     const res = await fetch("data/products.json", { cache: "no-store" });
     const products = await res.json();
     const lastProductionMap = await loadLastProductionMap();
+    const tagsData = await loadProductTagsData();
+    const tagsMap = tagsData.map;
+    const rawTagsList = tagsData.rawList;
 
-    renderTable(products, rate, lastProductionMap);
+    renderTable(products, rate, lastProductionMap, tagsMap);
 
     const searchInput = document.getElementById("searchInput");
     const togglePriceFilter = document.getElementById("togglePriceFilter");
@@ -126,7 +155,31 @@ async function loadProducts() {
     // Filter function
     function applyFilters() {
       const rawQuery = searchInput.value || "";
-      const query = rawQuery.trim().replace(/\s+/g, " ").toLowerCase();
+      
+      // Dynamic Tag Resolution
+      const hashRegex = /(?:^|\s)#([a-zA-Z0-9]+)/g;
+      let match;
+      const foundPrefixes = [];
+      while ((match = hashRegex.exec(rawQuery)) !== null) {
+        foundPrefixes.push(match[1].toLowerCase());
+      }
+
+      let queryIsInvalid = false;
+      const resolvedTags = [];
+
+      for (const prefix of foundPrefixes) {
+        const matches = rawTagsList.filter(t => t.startsWith(prefix));
+        if (matches.length === 1) {
+          resolvedTags.push(matches[0]);
+        } else {
+          // If 0 matches or >1 ambiguous matches, query is invalid
+          queryIsInvalid = true;
+          break;
+        }
+      }
+
+      // Clean query for Advanced Search
+      const cleanQuery = rawQuery.replace(/(?:^|\s)#[a-zA-Z0-9]+/g, '').trim().replace(/\s+/g, ' ').toLowerCase();
 
       const enablePrice = togglePriceFilter.checked;
       const min = parseFloat(minPrice.value) || 0;
@@ -142,18 +195,29 @@ async function loadProducts() {
         searchUnit = highest >= PRICE_THRESHOLD ? 'IDR' : 'USD';
       }
 
-      let queryIsInvalid = false;
-
       let filtered = [];
+      if (!queryIsInvalid) {
         try {
           filtered = (products || []).filter((p) => {
-            const searchableText = `${p.product_name || ""} ${p.product_code || ""}`.trim();
+            const codeForTags = normalizeCode(p.product_code || "").toLowerCase();
+            const pTags = tagsMap.get(codeForTags) || [];
+            const pTagNames = pTags.map(t => t.tag.toLowerCase());
 
-            const searchResults = searchStrings(query, [searchableText]);
-            const matchesSearch = searchResults.length > 0;
+            // 1. Tag Match Intersect
+            if (resolvedTags.length > 0) {
+              const hasAllTags = resolvedTags.every(rt => pTagNames.includes(rt));
+              if (!hasAllTags) return false;
+            }
 
-            if (!matchesSearch) return false;
+            // 2. String Match
+            if (cleanQuery) {
+              const searchableText = `${p.product_name || ""} ${p.product_code || ""}`.trim();
+              const searchResults = searchStrings(cleanQuery, [searchableText]);
+              const matchesSearch = searchResults.length > 0;
+              if (!matchesSearch) return false;
+            }
 
+            // 3. Price Filter
             const priceStr = p.marketing_price || "";
             const price = parseFloat(priceStr) || 0;
 
@@ -173,13 +237,14 @@ async function loadProducts() {
         } catch (err) {
           if (err instanceof ParseError) {
             queryIsInvalid = true;
-            filtered = []; // ensure empty results so renderTable receives []
+            filtered = []; 
           } else {
             throw err;
           }
         }
+      }
 
-      renderTable(filtered, rate, lastProductionMap, queryIsInvalid);
+      renderTable(filtered, rate, lastProductionMap, tagsMap, queryIsInvalid);
     }
 
     // Search and price filter events
@@ -253,7 +318,7 @@ async function loadProducts() {
 // -------------------------------------------------------------
 // TABLE RENDERING
 // -------------------------------------------------------------
-function renderTable(products, rate, lastProductionMap, queryIsInvalid = false) {
+function renderTable(products, rate, lastProductionMap, tagsMap, queryIsInvalid = false) {
   const tbody = document.querySelector("#productTable tbody");
   const noResults = document.getElementById("noResults");
   const invalidQuery = document.getElementById("invalidQuery");
@@ -291,28 +356,24 @@ function renderTable(products, rate, lastProductionMap, queryIsInvalid = false) 
     popup.classList.remove("no-transition");
   };
 
-  // Show popup at coordinates, prefer below the point but place above if not enough space
+  // Show popup at coordinates
   function showPopupAt(x, y, html, isClient = false) {
     if (!popup) return;
     popup.innerHTML = html;
 
-    // Determine client coordinates
     const clientX = isClient ? x : x - window.scrollX;
     const clientY = isClient ? y : y - window.scrollY;
     const margin = 8;
 
-    // Prepare initial invisible placement so we can measure
     popup.style.left = `${clientX + window.scrollX}px`;
     popup.style.top = `${clientY + window.scrollY}px`;
     popup.style.visibility = 'hidden';
 
-    // Temporarily add show to allow accurate measurement of final size/transform
     popup.classList.add('show');
     const rect = popup.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
 
-    // Decide vertical placement: prefer below, fallback above, otherwise clamp center
     const spaceBelow = window.innerHeight - clientY - margin;
     const spaceAbove = clientY - margin;
     let finalClientTop;
@@ -321,7 +382,6 @@ function renderTable(products, rate, lastProductionMap, queryIsInvalid = false) 
     } else if (spaceAbove >= height) {
       finalClientTop = Math.max(margin, clientY - height);
     } else {
-      // not enough space either side: clamp so popup fits in viewport
       if (spaceBelow >= spaceAbove) {
         finalClientTop = Math.max(margin, window.innerHeight - margin - height);
       } else {
@@ -329,35 +389,28 @@ function renderTable(products, rate, lastProductionMap, queryIsInvalid = false) 
       }
     }
 
-    // Horizontal placement: clamp within viewport
     let finalClientLeft = clientX;
     if (finalClientLeft + width > window.innerWidth - margin) {
       finalClientLeft = Math.max(margin, window.innerWidth - margin - width);
     }
     if (finalClientLeft < margin) finalClientLeft = margin;
 
-    // Convert to page coords and set
     const pageLeft = finalClientLeft + window.scrollX;
     const pageTop = finalClientTop + window.scrollY;
     popup.style.left = `${pageLeft}px`;
     popup.style.top = `${pageTop}px`;
 
-    // Reveal
     popup.style.visibility = '';
     popup.setAttribute('aria-hidden', 'false');
     popup.classList.add('show');
   }
 
-  // Helper: find a table row under client coordinates
   function getRowFromPoint(clientX, clientY) {
-    // elementFromPoint works in client coords
     const el = document.elementFromPoint(clientX, clientY);
     if (!el || !el.closest) return null;
     return el.closest("#productTable tbody tr");
   }
 
-  // Global mousemove: update movement timestamp, detect row under pointer via elementFromPoint,
-  // hide popup on motion and schedule show only if pointer is over a valid row.
   document.addEventListener("mousemove", (ev) => {
     lastMouseMoveTime = Date.now();
     lastMouseClientX = ev.clientX;
@@ -371,7 +424,6 @@ function renderTable(products, rate, lastProductionMap, queryIsInvalid = false) 
       return;
     }
 
-    // pointer is over a row; schedule show after stationary period
     hoverRow = possibleRow;
     hidePopup();
     clearShowTimer();
@@ -406,7 +458,6 @@ function renderTable(products, rate, lastProductionMap, queryIsInvalid = false) 
     invalidQuery.classList.add("hidden");
   }
 
-  // No results but query is valid
   if (!products || products.length === 0) {
     noResults.classList.remove("hidden");
     return;
@@ -416,6 +467,12 @@ function renderTable(products, rate, lastProductionMap, queryIsInvalid = false) 
 
   // Render rows
   products.forEach((p, i) => {
+    const code = normalizeCode(p.product_code || "").toLowerCase();
+    
+    // Tag generation (Removed title attribute to avoid browser hover popup)
+    const pTags = tagsMap?.get(code) || [];
+    const tagsHtml = pTags.map(t => `<span class="tag-badge">${t.icon}</span>`).join('');
+
     const priceStr = p.marketing_price || "";
     let displayPrice = formatWithCommas(priceStr);
     const price = parseFloat(priceStr);
@@ -432,15 +489,38 @@ function renderTable(products, rate, lastProductionMap, queryIsInvalid = false) 
     }
 
     const row = document.createElement("tr");
+    // Removed title attribute from copy button to avoid browser hover popup
     row.innerHTML = `
       <td>${i + 1}</td>
-      <td>${p.product_name || ""}</td>
-      <td>${p.product_code || ""}</td>
+      <td>${p.product_name || ""} ${tagsHtml}</td>
+      <td>
+        <span style="vertical-align: middle;">${p.product_code || ""}</span>
+        <button class="copy-btn">${COPY_SVG}</button>
+      </td>
       <td>${displayPrice}</td>
     `;
     tbody.appendChild(row);
 
-    const code = normalizeCode(p.product_code || "").toLowerCase();
+    // Copy Button Logic
+    const copyBtn = row.querySelector('.copy-btn');
+    if (copyBtn) {
+      const handleCopy = (ev) => {
+        ev.stopPropagation(); // Prevent popup showing on click/tap
+        navigator.clipboard.writeText(p.product_code || "").then(() => {
+          copyBtn.innerHTML = CHECK_SVG;
+          copyBtn.classList.add('copied-success');
+          setTimeout(() => {
+            copyBtn.innerHTML = COPY_SVG;
+            copyBtn.classList.remove('copied-success');
+          }, 1500);
+        }).catch(err => console.error('Copy failed', err));
+      };
+      copyBtn.addEventListener('click', handleCopy);
+      copyBtn.addEventListener('touchend', (ev) => {
+        ev.stopPropagation(); // Explicitly kill touchend for mobile row triggers
+      });
+    }
+
     const last = lastProductionMap?.get(code);
     const dateText = last?.date ? formatProductionDate(last.date) : null;
     const custText = last?.customer || null;

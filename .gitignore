@@ -10,6 +10,7 @@
 # Data outputs
 !data/
 !data/products.json
+!data/product_tags.json
 !data/last_updated.txt
 
 # Python source
