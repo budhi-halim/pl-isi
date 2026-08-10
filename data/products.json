@@ -12,7 +12,7 @@
   {
     "product_name": "ABON GURIH",
     "product_code": "MT-1201712-0",
-    "marketing_price": ""
+    "marketing_price": "3.85"
   },
   {
     "product_name": "ABON MAYO SEASONING",
@@ -7347,7 +7347,7 @@
   {
     "product_name": "CHICKEN BREADING",
     "product_code": "MT-1108991-0",
-    "marketing_price": ""
+    "marketing_price": "15000"
   },
   {
     "product_name": "CHICKEN BREADING",
@@ -7683,6 +7683,11 @@
     "product_name": "CHICKEN POWDER",
     "product_code": "31103080",
     "marketing_price": "5.95"
+  },
+  {
+    "product_name": "CHICKEN POWDER",
+    "product_code": "31103097",
+    "marketing_price": ""
   },
   {
     "product_name": "CHICKEN POWDER",
@@ -9727,7 +9732,7 @@
   {
     "product_name": "COKLAT BANANA SEASONING",
     "product_code": "31501949",
-    "marketing_price": ""
+    "marketing_price": "34000"
   },
   {
     "product_name": "COKLAT CAPPUCINO SEASONING",
@@ -13232,7 +13237,7 @@
   {
     "product_name": "HOT CHILLI SEASONING",
     "product_code": "MT-749134",
-    "marketing_price": ""
+    "marketing_price": "7.5"
   },
   {
     "product_name": "HOT CHILLI SEASONING",
@@ -15132,7 +15137,7 @@
   {
     "product_name": "KALDU SEAWEED",
     "product_code": "31301549",
-    "marketing_price": ""
+    "marketing_price": "4.25"
   },
   {
     "product_name": "KARE INDIA SEASONING",
@@ -15237,7 +15242,7 @@
   {
     "product_name": "KARI AYAM SEASONING",
     "product_code": "31102391",
-    "marketing_price": ""
+    "marketing_price": "3.65"
   },
   {
     "product_name": "KARI AYAM SEASONING",
@@ -20407,7 +20412,7 @@
   {
     "product_name": "ROASTED BEEF SEASONING",
     "product_code": "31201580",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "ROASTED BEEF SEASONING",
@@ -26947,7 +26952,7 @@
   {
     "product_name": "SOTO SEASONING",
     "product_code": "31407346",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "SOTO SEASONING",
@@ -29901,6 +29906,16 @@
   },
   {
     "product_name": "SWEET ROASTED CORN SEASONING",
+    "product_code": "31603092",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "SWEET ROASTED CORN SEASONING",
+    "product_code": "31603093",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "SWEET ROASTED CORN SEASONING",
     "product_code": "MT-122816 A",
     "marketing_price": "4.30"
   },
@@ -31202,7 +31217,7 @@
   {
     "product_name": "UDANG BAKAR JIMBARAN SEASONING",
     "product_code": "31301666",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "UDANG BAKAR SEASONING",
