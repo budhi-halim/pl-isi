@@ -8560,6 +8560,11 @@
     "marketing_price": "0"
   },
   {
+    "product_name": "CHILLI GARLIC SEASONING",
+    "product_code": "31408194",
+    "marketing_price": ""
+  },
+  {
     "product_name": "CHILLI LEMON SEAS",
     "product_code": "31405921",
     "marketing_price": "3.5"
@@ -10127,6 +10132,11 @@
   {
     "product_name": "CORN POWDER",
     "product_code": "31602942",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "CORN POWDER",
+    "product_code": "31603101",
     "marketing_price": ""
   },
   {
@@ -11972,6 +11982,11 @@
   {
     "product_name": "GARLIC POWDER",
     "product_code": "31802722",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "GARLIC POWDER",
+    "product_code": "31802724",
     "marketing_price": ""
   },
   {
@@ -22016,6 +22031,11 @@
   },
   {
     "product_name": "ROASTED CORN SEASONING",
+    "product_code": "31603100",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "ROASTED CORN SEASONING",
     "product_code": "D-103",
     "marketing_price": "4.5"
   },
@@ -25428,11 +25448,6 @@
     "product_name": "SEAFOOD BBQ SEASONING",
     "product_code": "31301740",
     "marketing_price": ""
-  },
-  {
-    "product_name": "SEAFOOD BBQ SEASONING",
-    "product_code": "MT-1101253-3",
-    "marketing_price": "0"
   },
   {
     "product_name": "SEAFOOD BBQ SEASONING / SA-13",
