@@ -11086,6 +11086,11 @@
   },
   {
     "product_name": "FISH POWDER",
+    "product_code": "31301741",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "FISH POWDER",
     "product_code": "MT-713933",
     "marketing_price": "0"
   },
@@ -11512,7 +11517,7 @@
   {
     "product_name": "GARLIC BBQ SEASONING",
     "product_code": "31406625",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "GARLIC BBQ SEASONING",
@@ -12193,11 +12198,6 @@
     "product_name": "GARLIC SEASONING",
     "product_code": "31801981",
     "marketing_price": "4.5"
-  },
-  {
-    "product_name": "GARLIC SEASONING",
-    "product_code": "31802214",
-    "marketing_price": "4.2"
   },
   {
     "product_name": "GARLIC SEASONING",
