@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "include": [
+    "index.html",
+    "css",
+    "js",
+    "assets",
+    "data/products.json",
+    "data/product_tags.json",
+    "data/last_updated.txt"
+  ]
+}

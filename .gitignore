@@ -24,3 +24,18 @@
 !.github/workflows/
 !.github/workflows/*.yml
 !.github/workflows/*.yaml
+# Shared family assets
+!/assets/
+!/assets/family/
+!/assets/family/**
+
+!/tools/
+!/tools/site-build/
+!/tools/site-build/**
+!/site-build.json
+!/.github/
+!/.github/workflows/
+!/.github/workflows/pages.yml
+/dist/
+/.site-build-*/
+/tools/site-build/node_modules/

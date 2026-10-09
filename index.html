@@ -1,65 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
-    <title>Product List</title>
-    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css" />
-    <script type="module" src="js/script.js"></script>
+<!doctype html>
+<html lang="en" class="isi-theme" data-theme="system">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Product List · Islandsun</title>
+  <link rel="icon" href="assets/family/assets/icons/favicon.ico">
+  <link rel="stylesheet" href="assets/family/css/tokens.css">
+  <link rel="stylesheet" href="assets/family/css/components.css">
+  <link rel="stylesheet" href="assets/family/css/interaction.css">
+  <link rel="stylesheet" href="assets/family/css/workspace.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="assets/family/js/navigation.js"></script>
+  <script type="module" src="js/ui.js"></script>
+
 </head>
-<body>
-  <header>
-    <h1>Product List</h1>
-    <div class="darkmode-toggle">
-      <label class="switch">
-        <input type="checkbox" id="darkModeToggle">
-        <span class="slider"></span>
-      </label>
-      <span class="toggle-label">Dark Mode</span>
+<body class="isi-ui isi-workspace" data-family-app>
+  <header class="isi-header">
+    <div class="isi-brand"><img src="assets/family/assets/icons/family.svg" alt=""><span>Product List<small>ISLANDSUN INDONESIA</small></span></div>
+    <div class="isi-header-actions">
+      <a class="isi-button isi-button--quiet" data-family-home href="../isi-share/">All apps</a>
+      <button type="button" id="theme-toggle" class="isi-button isi-button--icon isi-theme-toggle" aria-label="Switch color scheme"></button>
     </div>
   </header>
-
-  <div class="container">
-    <p id="lastUpdated" aria-live="polite">Last updated: Not available</p>
-
-    <section class="controls">
-      <input type="text" id="searchInput" placeholder="Search product name or code..." />
-
-      <div class="price-filter">
-        <label class="switch">
-          <input type="checkbox" id="togglePriceFilter" />
-          <span class="slider"></span>
-        </label>
-        <span class="toggle-label">Enable Price Filter</span>
-        <div id="priceRange" class="range-container hidden">
-          <input type="number" id="minPrice" placeholder="Min" min="0" />
-          <span class="to">to</span>
-          <input type="number" id="maxPrice" placeholder="Max" min="0" />
+  <main class="workspace-main">
+    <div id="loading-host"></div>
+    <div id="workspace-content" class="workspace-stack" hidden>
+      <div class="workspace-title"><h1>Product List</h1><p id="lastUpdated" class="isi-muted"></p></div>
+      <section class="product-filters" aria-label="Product filters">
+        <div class="product-search"><label class="isi-sr-only" for="searchInput">Search</label><input id="searchInput" type="search" placeholder="Search product name or code..."><button id="reset-filters" type="button" class="isi-button">Reset</button></div>
+        <div class="product-price-filter"><label class="price-switch"><input id="togglePriceFilter" type="checkbox">Filter by price</label>
+          <div id="priceRange" hidden><input id="minPrice" type="number" aria-label="Minimum price" placeholder="Min" min="0" step="any"><span>to</span><input id="maxPrice" type="number" aria-label="Maximum price" placeholder="Max" min="0" step="any"></div>
         </div>
-      </div>
-    </section>
-
-    <main>
-      <div class="table-container">
-        <table id="productTable" aria-describedby="noResults">
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>Product Name</th>
-              <th>Product Code</th>
-              <th>Marketing Price</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-        <div id="noResults" class="emptyTable hidden">No products match your search.</div>
-        <div id="invalidQuery" class="emptyTable hidden">Invalid search query.</div>
-      </div>
-    </main>
-  </div>
-
-  <button id="scrollTopBtn" aria-label="Scroll to top"></button>
-
+      </section>
+      <p id="rate-warning" class="isi-notice" hidden>Exchange rates are unavailable. Prices and price filters use the original currency.</p>
+      <div class="workspace-title"><p id="result-count" class="isi-muted" role="status"></p><p id="copy-status" class="isi-muted" role="status"></p></div>
+      <div class="isi-table-region" tabindex="0" aria-label="Products"><table id="productTable" class="isi-table isi-table--compact"><thead><tr><th scope="col" role="columnheader">No.</th><th scope="col" role="columnheader">Product Name</th><th scope="col" role="columnheader">Product Code</th><th scope="col" role="columnheader">Marketing Price</th></tr></thead><tbody></tbody></table></div>
+      <p id="noResults" class="workspace-status" hidden>No products match your search.</p>
+      <p id="invalidQuery" class="isi-notice" data-tone="error" role="status" hidden>Check your search syntax or use a longer, unique tag prefix.</p>
+    </div>
+    <div id="production-popup" class="production-popup" hidden></div>
+    <dialog id="production-dialog" class="workspace-dialog"><div class="workspace-title"><h2>Product details</h2><button type="button" id="close-production" class="isi-button">Close</button></div><div id="production-details" class="workspace-stack" data-family-selectable></div></dialog></main>
 </body>
 </html>
