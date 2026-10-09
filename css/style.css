@@ -20,7 +20,7 @@
   #productTable { display: block; min-width: 820px; }
   #productTable :is(thead, tbody) { display: block; }
   #productTable tr { display: grid; grid-template-columns: 56px minmax(280px, 1fr) 210px 160px; }
-  #productTable tbody { content-visibility: auto; contain-intrinsic-size: auto 5400px; }
+  #productTable tbody { content-visibility: auto; contain-intrinsic-size: auto 1728px; }
   #productTable :is(th, td) { display: flex; align-items: center; min-width: 0; }
   #productTable .product-code { width: 100%; }
 }
@@ -30,5 +30,5 @@
   .product-price-filter { gap: 8px; }
   #priceRange input { width: 76px; }
 }
-#production-details { padding-top: 20px; }
+#productTable tr[data-row] { cursor: pointer; }
 #loading-host:empty, #loading-host:has(.isi-loading[hidden]) { display: none; }

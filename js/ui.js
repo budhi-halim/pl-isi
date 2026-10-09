@@ -5,13 +5,12 @@ import { loadProducts } from './data.js';
 import { initializeBackTop } from '../assets/family/js/back-top.js';
 import { createNotifications } from '../assets/family/js/notifications.js';
 import { icon } from '../assets/family/js/icons.js';
-import { createRowHover, positionHover, fadeHover } from '../assets/family/js/row-hover.js';
+import { createProductionPreview } from './production-preview.js';
 
 const search = document.querySelector('#searchInput');
 const priceToggle = document.querySelector('#togglePriceFilter');
 const minimum = document.querySelector('#minPrice'), maximum = document.querySelector('#maxPrice');
 const table = document.querySelector('#productTable');
-const dialog = document.querySelector('#production-dialog');
 const popup = document.querySelector('#production-popup');
 let data = null;
 let debounce = null;
@@ -24,22 +23,17 @@ let requestId = 0;
 let rendering = 0;
 const copyIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6A2.25 2.25 0 0 0 14.25 3.75H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18A2.25 2.25 0 0 1 20.25 10.5V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-7.5a2.25 2.25 0 0 1 2.25-2.25h6Z"/></svg>';
 
-function productionContent(product, host) {
-  const last = data.lastProductionMap.get(normalizeCode(product.product_code || '').toLowerCase());
-  host.replaceChildren(element('h2', 'Last Production'), element('p', formatProductionDate(last?.date) || 'No data'));
-  if (last?.customer) host.append(element('p', last.customer, 'isi-muted'));
-}
-
-popup.classList.add('isi-row-hover');
-const rowHover = createRowHover({ root: table, resolveRow: hit => hit.closest('tr[data-row]'),
-  show: showPopup, hide: () => fadeHover(popup, false), move: point => { if (!popup.hidden) positionHover(popup, point); }, disabled: () => dialog.open });
-function hidePopup() { rowHover.dismiss(); }
-
-function showPopup(row, pointer) {
-  if (!row?.isConnected || !pointer || !visibleProducts[Number(row.dataset.row)]) return;
-  productionContent(visibleProducts[Number(row.dataset.row)], popup);
-  fadeHover(popup, true); positionHover(popup, pointer);
-}
+const preview = createProductionPreview({ table, popup,
+  busy: () => table.closest('.isi-table-region').getAttribute('aria-busy') === 'true',
+  describe: row => {
+    const product = visibleProducts[Number(row.dataset.row)];
+    if (!product) return null;
+    const last = data.lastProductionMap.get(normalizeCode(product.product_code || '').toLowerCase());
+    return { date: formatProductionDate(last?.date), customer: last?.customer };
+  }
+});
+const hidePopup = () => preview.dismiss();
+const yieldToInput = () => globalThis.scheduler?.yield ? scheduler.yield() : new Promise(resolve => setTimeout(resolve, 0));
 
 function render() {
   if (!data) return;
@@ -56,7 +50,15 @@ async function renderResult(result) {
   document.querySelector('#invalidQuery').hidden = !result.invalid;
   document.querySelector('#noResults').hidden = result.invalid || result.products.length > 0;
   document.querySelector('#result-count').textContent = `${result.products.length.toLocaleString()} products`;
-  for (const body of [...table.tBodies]) body.remove();
+  let removalStart = performance.now();
+  for (const body of [...table.tBodies]) {
+    body.remove();
+    if (performance.now() - removalStart >= 8) {
+      await yieldToInput();
+      if (current !== rendering) return;
+      removalStart = performance.now();
+    }
+  }
   let fragment = element('tbody');
   let sliceStart = performance.now();
   for (const [index, product] of result.products.entries()) {
@@ -78,13 +80,12 @@ async function renderResult(result) {
     copy.innerHTML = copyIcon; copy.setAttribute('aria-label', 'Copy product code');
     codeContent.append(element('span', product.product_code || ''), copy); code.append(codeContent);
     row.append(name, code, element('td', displayPrice(product.marketing_price, data.rate))); fragment.append(row);
-    if ((index + 1) % 100 === 0 || index === result.products.length - 1) {
+    if ((index + 1) % 32 === 0 || index === result.products.length - 1) {
       table.append(fragment); fragment = element('tbody');
     }
     // Cooperatively build the complete searchable table without one long input-blocking task.
     if (performance.now() - sliceStart >= 8 || index === result.products.length - 1) {
-      if (globalThis.scheduler?.yield) await scheduler.yield();
-      else await new Promise(resolve => setTimeout(resolve, 0));
+      await yieldToInput();
       if (current !== rendering) return;
       sliceStart = performance.now();
     }
@@ -100,10 +101,8 @@ document.querySelector('#reset-filters').addEventListener('click', () => {
   clearTimeout(debounce); search.value = ''; minimum.value = ''; maximum.value = ''; priceToggle.checked = false;
   document.querySelector('#priceRange').hidden = true; render(); search.focus();
 });
-const closeProduction = document.querySelector('#close-production');
-closeProduction.classList.add('isi-button--icon', 'isi-button--quiet'); closeProduction.innerHTML = icon('close'); closeProduction.setAttribute('aria-label', 'Close product details');
-closeProduction.addEventListener('click', () => dialog.close());
 table.addEventListener('click', async event => {
+  if (table.closest('.isi-table-region').getAttribute('aria-busy') === 'true') return;
   const row = event.target.closest('tr[data-row]'); if (!row) return;
   const product = visibleProducts[Number(row.dataset.row)];
   const copy = event.target.closest('[data-action="copy"]');
@@ -116,14 +115,12 @@ table.addEventListener('click', async event => {
     } catch { notifications.show('Unable to copy. Select the product code and copy it manually.', { key: 'copy-error', tone: 'error' }); }
     return;
   }
-  hidePopup(); productionContent(visibleProducts[Number(row.dataset.row)], document.querySelector('#production-details')); dialog.showModal();
+  preview.open(row, event);
 });
 table.addEventListener('contextmenu', event => {
   const row = event.target.closest('tr[data-row]'); if (!row) return;
-  event.preventDefault(); hidePopup(); productionContent(visibleProducts[Number(row.dataset.row)], document.querySelector('#production-details')); dialog.showModal();
+  event.preventDefault(); preview.open(row, event);
 });
-dialog.addEventListener('contextmenu', event => { event.preventDefault(); dialog.close(); });
-document.addEventListener('keydown', hidePopup);
 
 const gate = createReadinessGate({ host: document.querySelector('#loading-host'), content: document.querySelector('#workspace-content'),
   logoUrl: 'assets/family/assets/icons/family.svg', load: loadProducts,
@@ -139,7 +136,7 @@ const gate = createReadinessGate({ host: document.querySelector('#loading-host')
         if (response.id !== requestId) return;
         if (response.error) { failed(); return; }
         try {
-          await renderResult(response);
+          await renderResult({ invalid: response.invalid, products: Array.from(response.indices, index => data.products[index]) });
           if (initializing) { initializing = false; resolve(); }
         } catch { failed(); }
       };
@@ -149,4 +146,4 @@ const gate = createReadinessGate({ host: document.querySelector('#loading-host')
   }
 });
 gate.start();
-window.addEventListener('pagehide', event => { hidePopup(); clearTimeout(debounce); for (const timer of copyTimers.values()) clearTimeout(timer); notifications.clear(); if (!event.persisted) { rowHover.destroy(); rendering++; requestId++; worker?.terminate(); } });
+window.addEventListener('pagehide', event => { hidePopup(); clearTimeout(debounce); for (const timer of copyTimers.values()) clearTimeout(timer); notifications.clear(); if (!event.persisted) { preview.destroy(); rendering++; requestId++; worker?.terminate(); } });
