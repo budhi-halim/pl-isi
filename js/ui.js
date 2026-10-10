@@ -17,7 +17,7 @@ let debounce = null;
 let visibleProducts = [];
 const copyTimers = new Map();
 const notifications = createNotifications();
-initializeBackTop({ focusTarget: search });
+const backTop = initializeBackTop({ focusTarget: search });
 let worker = null;
 let requestId = 0;
 let rendering = 0;
@@ -146,4 +146,4 @@ const gate = createReadinessGate({ host: document.querySelector('#loading-host')
   }
 });
 gate.start();
-window.addEventListener('pagehide', event => { hidePopup(); clearTimeout(debounce); for (const timer of copyTimers.values()) clearTimeout(timer); notifications.clear(); if (!event.persisted) { preview.destroy(); rendering++; requestId++; worker?.terminate(); } });
+window.addEventListener('pagehide', event => { hidePopup(); clearTimeout(debounce); for (const timer of copyTimers.values()) clearTimeout(timer); notifications.clear(); if (!event.persisted) { backTop.destroy(); preview.destroy(); rendering++; requestId++; worker?.terminate(); } });

@@ -1,6 +1,6 @@
 @import url('../assets/family/css/row-hover.css');
 .isi-ui .price-switch { display: flex; align-items: center; gap: 10px; }
-#productTable { min-width: 700px; }
+#productTable { min-width: 700px; -webkit-tap-highlight-color: transparent; }
 #productTable td:nth-child(2) { white-space: normal; min-width: 280px; }
 .product-name-content { width: 100%; }
 .product-name { font: inherit; border: 0; background: transparent; color: var(--isi-text); padding: 4px 0; cursor: pointer; text-align: start; }
@@ -25,6 +25,10 @@
   #productTable .product-code { width: 100%; }
 }
 @media (pointer: coarse) { #productTable .isi-button--icon { min-height: 40px; width: 40px; } }
+@media (hover: none) {
+  #productTable tbody tr:hover { background: transparent; }
+  #productTable .product-name:hover { color: var(--isi-text); }
+}
 @media (max-width: 600px) {
   .product-search { flex-basis: 100%; }
   .product-price-filter { gap: 8px; }
