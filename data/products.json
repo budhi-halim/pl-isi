@@ -837,7 +837,7 @@
   {
     "product_name": "AYAM GORENG SEASONING",
     "product_code": "31102906",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "AYAM GORENG SERUNDENG SEASONING",
@@ -3371,11 +3371,6 @@
   },
   {
     "product_name": "BBQ SEASONING",
-    "product_code": "D-109",
-    "marketing_price": "4.25"
-  },
-  {
-    "product_name": "BBQ SEASONING",
     "product_code": "MT-1103041-0",
     "marketing_price": "0"
   },
@@ -3493,6 +3488,11 @@
     "product_name": "BBQ SEASONING / BQ 91",
     "product_code": "31408011",
     "marketing_price": "4.50"
+  },
+  {
+    "product_name": "BBQ SEASONING / BQG990",
+    "product_code": "D-109",
+    "marketing_price": "4.25"
   },
   {
     "product_name": "BBQ SEASONING / JUN XI",
@@ -4602,7 +4602,7 @@
   {
     "product_name": "BUMBU AYAM RICA RICA",
     "product_code": "44400101",
-    "marketing_price": ""
+    "marketing_price": "5.2"
   },
   {
     "product_name": "BUMBU AYAM SEMUR",
@@ -4912,7 +4912,7 @@
   {
     "product_name": "BUMBU OPOR",
     "product_code": "44400094",
-    "marketing_price": ""
+    "marketing_price": "5"
   },
   {
     "product_name": "BUMBU RASA UDANG",
@@ -7967,7 +7967,7 @@
   {
     "product_name": "CHICKEN SEASONING",
     "product_code": "01-0014",
-    "marketing_price": ""
+    "marketing_price": "2.45"
   },
   {
     "product_name": "CHICKEN SEASONING",
@@ -9572,7 +9572,7 @@
   {
     "product_name": "COCONUT SEASONING",
     "product_code": "31503000",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "COCOPANDAN",
@@ -11358,11 +11358,6 @@
     "product_name": "FRIED CHICKEN SEASONING",
     "product_code": "31102895",
     "marketing_price": "0"
-  },
-  {
-    "product_name": "FRIED CHICKEN SEASONING",
-    "product_code": "MT-203811",
-    "marketing_price": "3"
   },
   {
     "product_name": "FRIED CHICKEN SEASONING / GUN IV",
@@ -22646,6 +22641,11 @@
   },
   {
     "product_name": "ROASTED POWDER / RP",
+    "product_code": "MT-632434",
+    "marketing_price": "4.3"
+  },
+  {
+    "product_name": "ROASTED POWDER / RTO275",
     "product_code": "MT-632434",
     "marketing_price": "4.3"
   },
