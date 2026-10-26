@@ -2,7 +2,6 @@
   "schema": 1,
   "include": [
     "index.html",
-    "pl-isi-log.html",
     "css",
     "js",
     "assets",

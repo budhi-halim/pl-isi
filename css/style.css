@@ -10,7 +10,7 @@
 .price-sort:not([data-order="off"]) { color: var(--isi-primary); border-color: var(--isi-primary); background: var(--isi-primary-soft); }
 .price-sort[data-order="ascending"] .sort-down, .price-sort[data-order="descending"] .sort-up { opacity: .25; }
 @media (prefers-reduced-motion: reduce) { .price-filter-track, .price-filter-track::after { transition: none; } }
-#productTable { display: block; min-width: 820px; -webkit-tap-highlight-color: transparent; }
+#productTable { display: block; min-width: 820px; }
 #productTable td:nth-child(2) { white-space: normal; min-width: 280px; }
 .product-name-content { width: 100%; }
 .product-name { font: inherit; border: 0; background: transparent; color: var(--isi-text); padding: 4px 0; cursor: pointer; text-align: start; }

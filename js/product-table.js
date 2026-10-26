@@ -1,5 +1,4 @@
 import { groupOffsets, mountedGroups, ROWS_PER_GROUP } from './list-layout.js';
-import { recordDiagnostic } from './diagnostics-client.js';
 
 /** Keep native row controls near the viewport, retaining a focused row until focus leaves it. */
 export function createProductTable({ table, createRow }) {
@@ -66,7 +65,6 @@ export function createProductTable({ table, createRow }) {
 
   function update(extraGroup = -1) {
     if (destroyed) return;
-    const started = performance.now();
     const top = -table.tHead.getBoundingClientRect().bottom;
     const required = mountedGroups(offsets, top, innerHeight, [focusedGroup(), extraGroup]);
     const requiredSet = new Set(required);
@@ -93,11 +91,6 @@ export function createProductTable({ table, createRow }) {
       if (body === cursor) cursor = cursor.nextElementSibling;
       else table.insertBefore(body, cursor);
     }
-    if (changed) recordDiagnostic('table-window', { firstRow: required[0] * ROWS_PER_GROUP, lastRow: Math.min(((required.at(-1) ?? -1) + 1) * ROWS_PER_GROUP, products.length), ...stats(), durationMs: performance.now() - started });
-  }
-
-  function stats() {
-    return { totalRows: products.length, mountedRows: [...groups.values()].reduce((count, body) => count + body.rows.length, 0), groups: groups.size, totalGroups: offsets.length - 1, mode: 'windowed' };
   }
 
   function setProducts(next) {
@@ -107,7 +100,6 @@ export function createProductTable({ table, createRow }) {
     for (const body of [...table.tBodies]) body.remove();
     table.setAttribute('aria-rowcount', String(products.length + 1));
     update();
-    return stats();
   }
 
   table.addEventListener('keydown', event => {
@@ -126,7 +118,6 @@ export function createProductTable({ table, createRow }) {
     const target = groups.get(group).querySelector(`[data-row="${next}"] [data-action="${backwards ? 'copy' : 'details'}"]`);
     target.focus({ preventScroll: true });
     target.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
-    recordDiagnostic('table-keyboard-row', { row: next });
   }, { signal });
   table.addEventListener('focusin', schedule, { signal });
   table.addEventListener('focusout', schedule, { signal });
