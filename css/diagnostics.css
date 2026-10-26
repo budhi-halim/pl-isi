@@ -1,0 +1,7 @@
+.diagnostics-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; padding: 14px 16px; margin-block-end: 18px; border: 1px solid var(--isi-border); border-radius: var(--isi-control-radius); background: var(--isi-surface); }
+.diagnostics-bar h2 { margin: 0; font-size: 1rem; }
+.diagnostics-bar p { margin: 4px 0 0; color: var(--isi-muted); font-size: .8125rem; }
+.diagnostics-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.diagnostics-actions svg { width: 18px; height: 18px; flex: none; }
+#diagnostic-status { flex-basis: 100%; min-width: 0; overflow-wrap: anywhere; }
+#diagnostic-status:empty { display: none; }

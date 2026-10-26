@@ -1,5 +1,6 @@
 *
 !index.html
+!pl-isi-log.html
 
 # Frontend assets
 !css/
@@ -33,6 +34,8 @@
 !/tools/site-build/
 !/tools/site-build/**
 !/site-build.json
+!/tests/
+!/tests/*.mjs
 !/.github/
 !/.github/workflows/
 !/.github/workflows/pages.yml

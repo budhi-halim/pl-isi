@@ -1,5 +1,15 @@
 @import url('../assets/family/css/row-hover.css');
-.isi-ui .price-switch { display: flex; align-items: center; gap: 10px; }
+.price-filter-toggle { white-space: nowrap; }
+.price-filter-track { position: relative; display: block; flex: none; width: 34px; height: 20px; border-radius: 20px; background: var(--isi-muted); transition: background var(--isi-motion); }
+.price-filter-track::after { content: ''; position: absolute; inset: 3px auto auto 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--isi-surface); transition: transform var(--isi-motion); }
+.price-filter-toggle[aria-checked="true"] { color: var(--isi-primary); border-color: var(--isi-primary); background: var(--isi-primary-soft); }
+.price-filter-toggle[aria-checked="true"] .price-filter-track { background: var(--isi-primary); }
+.price-filter-toggle[aria-checked="true"] .price-filter-track::after { transform: translateX(14px); background: var(--isi-on-primary); }
+.price-sort { white-space: nowrap; }
+.price-sort svg { width: 20px; height: 20px; flex: none; }
+.price-sort:not([data-order="off"]) { color: var(--isi-primary); border-color: var(--isi-primary); background: var(--isi-primary-soft); }
+.price-sort[data-order="ascending"] .sort-down, .price-sort[data-order="descending"] .sort-up { opacity: .25; }
+@media (prefers-reduced-motion: reduce) { .price-filter-track, .price-filter-track::after { transition: none; } }
 #productTable { min-width: 700px; -webkit-tap-highlight-color: transparent; }
 #productTable td:nth-child(2) { white-space: normal; min-width: 280px; }
 .product-name-content { width: 100%; }

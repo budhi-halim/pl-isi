@@ -29,7 +29,22 @@ export function productTags(groups) {
 /** Ordered uses precisely the same availability rule as the production detail. */
 export function isOrdered(last) { return Boolean(last?.date || last?.customer); }
 
-export function filterProducts({ products, rate, lastProductionMap, tagsMap, rawTagsList }, { query = '', enablePrice = false, minimum = '', maximum = '' }) {
+export function canSortPrices(products, rate) {
+  return (Number.isFinite(rate) && rate > 0) || products.every(product => !(parseFloat(product.marketing_price) >= 1000));
+}
+
+/** Compare unrounded USD amounts, retaining source order for equal prices. */
+export function sortProductsByPrice(products, order, rate) {
+  if (!['ascending', 'descending'].includes(order) || !canSortPrices(products, rate)) return products;
+  const direction = order === 'ascending' ? 1 : -1;
+  return products.map((product, index) => {
+    const raw = parseFloat(product.marketing_price);
+    const price = Number.isFinite(raw) ? raw : 0;
+    return { product, index, usd: price >= 1000 ? price / rate : price };
+  }).sort((a, b) => direction * (a.usd - b.usd) || a.index - b.index).map(entry => entry.product);
+}
+
+export function filterProducts({ products, rate, lastProductionMap, tagsMap, rawTagsList }, { query = '', enablePrice = false, minimum = '', maximum = '', priceOrder = 'off' } = {}) {
   const prefixes = Array.from(query.matchAll(/(?:^|\s)#([a-zA-Z0-9]+)/g), match => match[1].toLowerCase());
   const resolvedTags = [];
   for (const prefix of prefixes) {
@@ -39,13 +54,14 @@ export function filterProducts({ products, rate, lastProductionMap, tagsMap, raw
   }
   const cleanQuery = query.replace(/(?:^|\s)#[a-zA-Z0-9]+/g, '').trim().replace(/\s+/g, ' ').toLowerCase();
   const min = parseFloat(minimum) || 0;
-  const max = parseFloat(maximum) || Infinity;
+  const parsedMaximum = parseFloat(maximum);
+  const max = Number.isFinite(parsedMaximum) ? parsedMaximum : Infinity;
   const inputs = [];
   if (String(minimum).trim() !== '') inputs.push(min);
   if (String(maximum).trim() !== '') inputs.push(max);
   const searchUnit = inputs.length ? (Math.max(...inputs) >= 1000 ? 'IDR' : 'USD') : null;
   try {
-    return { invalid: false, products: products.filter(product => {
+    const matches = products.filter(product => {
       const code = normalizeCode(product.product_code || '').toLowerCase();
       const tags = (tagsMap.get(code) || []).map(tag => tag.tag.toLowerCase());
       if (isOrdered(lastProductionMap.get(code))) tags.push('ordered');
@@ -58,7 +74,8 @@ export function filterProducts({ products, rate, lastProductionMap, tagsMap, raw
       const isUSD = price < 1000;
       const value = searchUnit === 'USD' ? (isUSD ? price : price / rate) : (isUSD ? price * rate : price);
       return value >= min && value <= max;
-    }) };
+    });
+    return { invalid: false, products: sortProductsByPrice(matches, priceOrder, rate) };
   } catch (error) {
     if (error instanceof ParseError) return { products: [], invalid: true };
     throw error;

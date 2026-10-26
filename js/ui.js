@@ -1,14 +1,16 @@
 import { element, button } from '../assets/family/js/workspace.js';
 import { createReadinessGate } from '../assets/family/js/readiness.js';
-import { normalizeCode, displayPrice, formatProductionDate } from './logic.js';
+import { normalizeCode, displayPrice, formatProductionDate, canSortPrices } from './logic.js';
 import { loadProducts } from './data.js';
 import { initializeBackTop } from '../assets/family/js/back-top.js';
 import { createNotifications } from '../assets/family/js/notifications.js';
 import { icon } from '../assets/family/js/icons.js';
 import { createProductionPreview } from './production-preview.js';
+import { recordDiagnostic } from './diagnostics-client.js';
 
 const search = document.querySelector('#searchInput');
 const priceToggle = document.querySelector('#togglePriceFilter');
+const priceSort = document.querySelector('#price-sort');
 const minimum = document.querySelector('#minPrice'), maximum = document.querySelector('#maxPrice');
 const table = document.querySelector('#productTable');
 const popup = document.querySelector('#production-popup');
@@ -21,6 +23,9 @@ const backTop = initializeBackTop({ focusTarget: search });
 let worker = null;
 let requestId = 0;
 let rendering = 0;
+let priceOrder = 'off';
+const PRICE_ORDERS = ['off', 'ascending', 'descending'];
+const PRICE_ORDER_LABELS = { off: 'Off', ascending: 'Low to high', descending: 'High to low' };
 const copyIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6A2.25 2.25 0 0 0 14.25 3.75H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18A2.25 2.25 0 0 1 20.25 10.5V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-7.5a2.25 2.25 0 0 1 2.25-2.25h6Z"/></svg>';
 
 const preview = createProductionPreview({ table, popup,
@@ -35,16 +40,33 @@ const preview = createProductionPreview({ table, popup,
 const hidePopup = () => preview.dismiss();
 const yieldToInput = () => globalThis.scheduler?.yield ? scheduler.yield() : new Promise(resolve => setTimeout(resolve, 0));
 
+function readFilters() {
+  return { query: search.value, enablePrice: priceToggle.getAttribute('aria-checked') === 'true', minimum: minimum.value, maximum: maximum.value, priceOrder };
+}
+
+function updatePriceOrder(order) {
+  priceOrder = order;
+  priceSort.dataset.order = order;
+  priceSort.querySelector('span').textContent = `Price: ${PRICE_ORDER_LABELS[order]}`;
+  const next = PRICE_ORDERS[(PRICE_ORDERS.indexOf(order) + 1) % PRICE_ORDERS.length];
+  priceSort.setAttribute('aria-label', `Sort by price in USD: ${PRICE_ORDER_LABELS[order].toLowerCase()}. Activate for ${next === 'off' ? 'original order' : `${next} price`}.`);
+  document.querySelector('#price-column').setAttribute('aria-sort', order === 'off' ? 'none' : order);
+}
+
 function render() {
   if (!data) return;
   rendering++;
   table.closest('.isi-table-region').setAttribute('aria-busy', 'true');
-  const filters = { query: search.value, enablePrice: priceToggle.checked, minimum: minimum.value, maximum: maximum.value };
-  worker.postMessage({ type: 'query', id: ++requestId, filters });
+  const filters = readFilters();
+  const id = ++requestId;
+  recordDiagnostic('worker-query', { id, queryLength: filters.query.length, enablePrice: filters.enablePrice, minimum: filters.minimum, maximum: filters.maximum, priceOrder });
+  worker.postMessage({ type: 'query', id, filters });
 }
 
 async function renderResult(result) {
   const current = ++rendering;
+  const started = performance.now();
+  recordDiagnostic('render-start', { generation: current, count: result.products.length, invalid: result.invalid });
   hidePopup(); for (const timer of copyTimers.values()) clearTimeout(timer); copyTimers.clear();
   visibleProducts = result.products;
   document.querySelector('#invalidQuery').hidden = !result.invalid;
@@ -54,8 +76,9 @@ async function renderResult(result) {
   for (const body of [...table.tBodies]) {
     body.remove();
     if (performance.now() - removalStart >= 8) {
+      recordDiagnostic('render-yield', { generation: current, phase: 'remove', durationMs: performance.now() - removalStart });
       await yieldToInput();
-      if (current !== rendering) return;
+      if (current !== rendering) { recordDiagnostic('render-superseded', { generation: current }); return; }
       removalStart = performance.now();
     }
   }
@@ -85,20 +108,32 @@ async function renderResult(result) {
     }
     // Cooperatively build the complete searchable table without one long input-blocking task.
     if (performance.now() - sliceStart >= 8 || index === result.products.length - 1) {
+      recordDiagnostic('render-yield', { generation: current, phase: 'append', rows: index + 1, durationMs: performance.now() - sliceStart });
       await yieldToInput();
-      if (current !== rendering) return;
+      if (current !== rendering) { recordDiagnostic('render-superseded', { generation: current }); return; }
       sliceStart = performance.now();
     }
   }
   table.closest('.isi-table-region').setAttribute('aria-busy', 'false');
+  recordDiagnostic('render-complete', { generation: current, count: result.products.length, durationMs: performance.now() - started, groups: table.tBodies.length });
 }
 
-function schedule() { rendering++; requestId++; clearTimeout(debounce); debounce = setTimeout(render, 180); }
+function schedule() { rendering++; requestId++; clearTimeout(debounce); recordDiagnostic('filter-scheduled', { queryLength: search.value.length }); debounce = setTimeout(render, 180); }
 search.addEventListener('input', schedule);
 minimum.addEventListener('input', schedule); maximum.addEventListener('input', schedule);
-priceToggle.addEventListener('change', () => { document.querySelector('#priceRange').hidden = !priceToggle.checked; render(); });
+priceToggle.addEventListener('click', () => {
+  const enabled = priceToggle.getAttribute('aria-checked') !== 'true';
+  priceToggle.setAttribute('aria-checked', String(enabled));
+  document.querySelector('#priceRange').hidden = !enabled;
+  clearTimeout(debounce); render();
+});
+priceSort.addEventListener('click', () => {
+  if (!data || priceSort.disabled) return;
+  updatePriceOrder(PRICE_ORDERS[(PRICE_ORDERS.indexOf(priceOrder) + 1) % PRICE_ORDERS.length]);
+  clearTimeout(debounce); render();
+});
 document.querySelector('#reset-filters').addEventListener('click', () => {
-  clearTimeout(debounce); search.value = ''; minimum.value = ''; maximum.value = ''; priceToggle.checked = false;
+  clearTimeout(debounce); search.value = ''; minimum.value = ''; maximum.value = ''; priceToggle.setAttribute('aria-checked', 'false'); updatePriceOrder('off');
   document.querySelector('#priceRange').hidden = true; render(); search.focus();
 });
 table.addEventListener('click', async event => {
@@ -116,6 +151,7 @@ table.addEventListener('click', async event => {
     return;
   }
   preview.open(row, event);
+  recordDiagnostic('production-preview', { row: Number(row.dataset.row), input: event.pointerType || 'keyboard' });
 });
 table.addEventListener('contextmenu', event => {
   const row = event.target.closest('tr[data-row]'); if (!row) return;
@@ -127,23 +163,29 @@ const gate = createReadinessGate({ host: document.querySelector('#loading-host')
   onReady: async result => {
     data = result; document.querySelector('#lastUpdated').textContent = `Last updated: ${formatProductionDate(data.updated) || 'Not available'}`;
     worker?.terminate(); worker = new Worker(new URL('./product-worker.js', import.meta.url), { type: 'module' });
-    const fail = () => { table.closest('.isi-table-region').setAttribute('aria-busy', 'false'); notifications.show('Products could not be displayed. Reload the page to try again.', { key: 'products-error', tone: 'error' }); };
+    const fail = () => { recordDiagnostic('products-failed'); table.closest('.isi-table-region').setAttribute('aria-busy', 'false'); notifications.show('Products could not be displayed. Reload the page to try again.', { key: 'products-error', tone: 'error' }); };
     document.querySelector('#rate-warning').hidden = Boolean(data.rate);
+    priceSort.disabled = !canSortPrices(data.products, data.rate);
+    if (priceSort.disabled) { updatePriceOrder('off'); priceSort.setAttribute('aria-describedby', 'rate-warning'); }
+    else priceSort.removeAttribute('aria-describedby');
     await new Promise((resolve, reject) => {
       let initializing = true;
       const failed = () => { if (initializing) { initializing = false; reject(new Error('products')); } else fail(); };
       worker.onmessage = async ({ data: response }) => {
-        if (response.id !== requestId) return;
+        recordDiagnostic('worker-result', { id: response.id, currentId: requestId, count: response.indices?.length, durationMs: response.durationMs, error: response.error, invalid: response.invalid });
+        if (response.id !== requestId) { recordDiagnostic('worker-result-discarded', { id: response.id }); return; }
         if (response.error) { failed(); return; }
         try {
           await renderResult({ invalid: response.invalid, products: Array.from(response.indices, index => data.products[index]) });
           if (initializing) { initializing = false; resolve(); }
         } catch { failed(); }
       };
-      worker.onerror = failed;
-      worker.postMessage({ type: 'initialize', snapshot: data, id: ++requestId, filters: { query: search.value, enablePrice: priceToggle.checked, minimum: minimum.value, maximum: maximum.value } });
+      worker.onerror = event => { recordDiagnostic('worker-error', { message: event.message, filename: event.filename, line: event.lineno }); failed(); };
+      recordDiagnostic('worker-initialize', { id: requestId + 1, count: data.products.length, rate: data.rate });
+      worker.postMessage({ type: 'initialize', snapshot: data, id: ++requestId, filters: readFilters() });
     });
   }
 });
-gate.start();
+recordDiagnostic('application-start');
+gate.start().then(ready => recordDiagnostic('application-ready', { ready }));
 window.addEventListener('pagehide', event => { hidePopup(); clearTimeout(debounce); for (const timer of copyTimers.values()) clearTimeout(timer); notifications.clear(); if (!event.persisted) { backTop.destroy(); preview.destroy(); rendering++; requestId++; worker?.terminate(); } });
