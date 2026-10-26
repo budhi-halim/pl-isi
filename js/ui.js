@@ -7,6 +7,7 @@ import { createNotifications } from '../assets/family/js/notifications.js';
 import { icon } from '../assets/family/js/icons.js';
 import { createProductionPreview } from './production-preview.js';
 import { recordDiagnostic } from './diagnostics-client.js';
+import { createProductTable } from './product-table.js';
 
 const search = document.querySelector('#searchInput');
 const priceToggle = document.querySelector('#togglePriceFilter');
@@ -38,7 +39,7 @@ const preview = createProductionPreview({ table, popup,
   }
 });
 const hidePopup = () => preview.dismiss();
-const yieldToInput = () => globalThis.scheduler?.yield ? scheduler.yield() : new Promise(resolve => setTimeout(resolve, 0));
+const productTable = createProductTable({ table, createRow: createProductRow });
 
 function readFilters() {
   return { query: search.value, enablePrice: priceToggle.getAttribute('aria-checked') === 'true', minimum: minimum.value, maximum: maximum.value, priceOrder };
@@ -63,7 +64,7 @@ function render() {
   worker.postMessage({ type: 'query', id, filters });
 }
 
-async function renderResult(result) {
+function renderResult(result) {
   const current = ++rendering;
   const started = performance.now();
   recordDiagnostic('render-start', { generation: current, count: result.products.length, invalid: result.invalid });
@@ -72,50 +73,31 @@ async function renderResult(result) {
   document.querySelector('#invalidQuery').hidden = !result.invalid;
   document.querySelector('#noResults').hidden = result.invalid || result.products.length > 0;
   document.querySelector('#result-count').textContent = `${result.products.length.toLocaleString()} products`;
-  let removalStart = performance.now();
-  for (const body of [...table.tBodies]) {
-    body.remove();
-    if (performance.now() - removalStart >= 8) {
-      recordDiagnostic('render-yield', { generation: current, phase: 'remove', durationMs: performance.now() - removalStart });
-      await yieldToInput();
-      if (current !== rendering) { recordDiagnostic('render-superseded', { generation: current }); return; }
-      removalStart = performance.now();
-    }
-  }
-  let fragment = element('tbody');
-  let sliceStart = performance.now();
-  for (const [index, product] of result.products.entries()) {
-    const row = element('tr'); row.dataset.row = index;
-    row.append(element('td', index + 1));
-    const name = element('td'), nameContent = element('div', undefined, 'product-name-content');
-    const details = button(product.product_name || 'Unnamed product', null, 'product-name');
-    details.dataset.action = 'details';
-    details.setAttribute('aria-label', `${product.product_name || 'Product'} — last production`);
-    nameContent.append(details);
-    const codeKey = normalizeCode(product.product_code || '').toLowerCase();
-    for (const tag of data.tagsMap.get(codeKey) || []) {
-      const badge = element('span', tag.icon, 'tag-badge'); badge.setAttribute('aria-label', tag.tag); nameContent.append(badge);
-    }
-    name.append(nameContent);
-    const code = element('td'), codeContent = element('div', undefined, 'product-code');
-    const copy = button('', null, 'isi-button isi-button--icon isi-button--quiet');
-    copy.dataset.action = 'copy';
-    copy.innerHTML = copyIcon; copy.setAttribute('aria-label', 'Copy product code');
-    codeContent.append(element('span', product.product_code || ''), copy); code.append(codeContent);
-    row.append(name, code, element('td', displayPrice(product.marketing_price, data.rate))); fragment.append(row);
-    if ((index + 1) % 32 === 0 || index === result.products.length - 1) {
-      table.append(fragment); fragment = element('tbody');
-    }
-    // Cooperatively build the complete searchable table without one long input-blocking task.
-    if (performance.now() - sliceStart >= 8 || index === result.products.length - 1) {
-      recordDiagnostic('render-yield', { generation: current, phase: 'append', rows: index + 1, durationMs: performance.now() - sliceStart });
-      await yieldToInput();
-      if (current !== rendering) { recordDiagnostic('render-superseded', { generation: current }); return; }
-      sliceStart = performance.now();
-    }
-  }
+  const viewStats = productTable.setProducts(visibleProducts);
   table.closest('.isi-table-region').setAttribute('aria-busy', 'false');
-  recordDiagnostic('render-complete', { generation: current, count: result.products.length, durationMs: performance.now() - started, groups: table.tBodies.length });
+  recordDiagnostic('render-complete', { generation: current, count: result.products.length, durationMs: performance.now() - started, ...viewStats });
+}
+
+function createProductRow(product, index) {
+  const row = element('tr'); row.dataset.row = index;
+  row.append(element('td', index + 1));
+  const name = element('td'), nameContent = element('div', undefined, 'product-name-content');
+  const details = button(product.product_name || 'Unnamed product', null, 'product-name');
+  details.dataset.action = 'details';
+  details.setAttribute('aria-label', `${product.product_name || 'Product'} — last production`);
+  nameContent.append(details);
+  const codeKey = normalizeCode(product.product_code || '').toLowerCase();
+  for (const tag of data.tagsMap.get(codeKey) || []) {
+    const badge = element('span', tag.icon, 'tag-badge'); badge.setAttribute('aria-label', tag.tag); nameContent.append(badge);
+  }
+  name.append(nameContent);
+  const code = element('td'), codeContent = element('div', undefined, 'product-code');
+  const copy = button('', null, 'isi-button isi-button--icon isi-button--quiet');
+  copy.dataset.action = 'copy';
+  copy.innerHTML = copyIcon; copy.setAttribute('aria-label', 'Copy product code');
+  codeContent.append(element('span', product.product_code || ''), copy); code.append(codeContent);
+  row.append(name, code, element('td', displayPrice(product.marketing_price, data.rate)));
+  return row;
 }
 
 function schedule() { rendering++; requestId++; clearTimeout(debounce); recordDiagnostic('filter-scheduled', { queryLength: search.value.length }); debounce = setTimeout(render, 180); }
@@ -188,4 +170,4 @@ const gate = createReadinessGate({ host: document.querySelector('#loading-host')
 });
 recordDiagnostic('application-start');
 gate.start().then(ready => recordDiagnostic('application-ready', { ready }));
-window.addEventListener('pagehide', event => { hidePopup(); clearTimeout(debounce); for (const timer of copyTimers.values()) clearTimeout(timer); notifications.clear(); if (!event.persisted) { backTop.destroy(); preview.destroy(); rendering++; requestId++; worker?.terminate(); } });
+window.addEventListener('pagehide', event => { hidePopup(); clearTimeout(debounce); for (const timer of copyTimers.values()) clearTimeout(timer); notifications.clear(); if (!event.persisted) { backTop.destroy(); preview.destroy(); productTable.destroy(); rendering++; requestId++; worker?.terminate(); } });

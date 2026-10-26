@@ -33,7 +33,7 @@
   function stats() { return { recorded: sequence, retained: startup.length + length, dropped, characters, elapsedMs: round(performance.now() - started) }; }
   function snapshot() {
     const entries = startup.concat(Array.from({ length }, (_, index) => recent[(head + index) % MAX_ENTRIES]));
-    return { schema: 1, application: 'Product List diagnostics', startedAt, exportedAt: new Date().toISOString(), timeOrigin: performance.timeOrigin,
+    return { schema: 2, application: 'Product List diagnostics', startedAt, exportedAt: new Date().toISOString(), timeOrigin: performance.timeOrigin,
       page: location.origin + location.pathname, retention: { ...stats(), maxEntries: MAX_ENTRIES + 64, maxCharacters: MAX_CHARACTERS, startupEntriesPreserved: startup.length },
       counts: { ...counts }, events: entries.map(text => JSON.parse(text)) };
   }
@@ -48,6 +48,31 @@
   const targetName = target => target instanceof Element ? (target.id ? `#${target.id}` : target.closest('.workspace-back-top') ? 'back-to-top' : `${target.tagName.toLowerCase()}${target.dataset.action ? `[${target.dataset.action}]` : ''}`) : 'window';
   const errorDetails = error => ({ name: error?.name || 'Error', message: String(error?.message || error || '').slice(0, 1500), stack: String(error?.stack || '').slice(0, 4000) });
   const viewport = () => ({ width: innerWidth, height: innerHeight, pixelRatio: devicePixelRatio, visual: window.visualViewport ? { width: visualViewport.width, height: visualViewport.height, scale: visualViewport.scale, offsetTop: visualViewport.offsetTop } : null });
+  let position = { scrollY: 0, scrollX: 0, scrollPositionAtMs: null };
+  let geometryFrame = 0, geometryTimer = 0;
+  const geometryEvents = new Set();
+  function sampleGeometry() {
+    geometryTimer = 0;
+    if (stopped || document.hidden) return;
+    const at = performance.now();
+    position = { scrollY: window.scrollY, scrollX: window.scrollX, scrollPositionAtMs: at };
+    if (geometryEvents.size) {
+      const size = viewport();
+      for (const event of geometryEvents) record(event, size);
+      geometryEvents.clear();
+    }
+    const durationMs = performance.now() - at;
+    if (durationMs >= 8) record('recorder-geometry-cost', { durationMs });
+  }
+  function scheduleGeometry(event) {
+    if (event) geometryEvents.add(event);
+    if (stopped || document.hidden || geometryFrame || geometryTimer) return;
+    // Geometry reads run after a paint opportunity, never inside frame measurement.
+    geometryFrame = requestAnimationFrame(() => {
+      geometryFrame = 0;
+      geometryTimer = setTimeout(sampleGeometry, 0);
+    });
+  }
   record('recorder-start', { state: document.readyState, visible: !document.hidden, userAgent: navigator.userAgent, language: navigator.language,
     hardwareConcurrency: navigator.hardwareConcurrency, deviceMemory: navigator.deviceMemory, touchPoints: navigator.maxTouchPoints, viewport: viewport(),
     reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches, contentVisibility: CSS.supports('content-visibility', 'auto'),
@@ -80,14 +105,15 @@
   listen(window, 'unhandledrejection', event => record('unhandled-rejection', errorDetails(event.reason)));
   listen(window, 'online', () => record('network-state', { online: true }));
   listen(window, 'offline', () => record('network-state', { online: false }));
-  listen(window, 'resize', () => record('viewport', viewport()));
-  listen(window.visualViewport, 'resize', () => record('visual-viewport', viewport()));
+  listen(window, 'resize', () => scheduleGeometry('viewport'));
+  listen(window.visualViewport, 'resize', () => scheduleGeometry('visual-viewport'));
 
   // === Input, scrolling and main-thread timing ===
-  let activeUntil = 0, lastScroll = 0, scrollEvents = 0, lastScrollSample = 0;
+  let activeUntil = 0, lastScroll = 0, scrollEvents = 0, sampleScrollEvents = 0, lastScrollSample = 0;
   let lastFrame = 0, frame = 0, frames = 0, frameTotal = 0, worstFrame = 0, slowFrames = 0;
   let lastHeartbeat = performance.now(), heartbeat = 0;
   let changes = { batches: 0, added: 0, removed: 0, attributes: 0 };
+  let passiveEvents = Object.create(null);
   let lastTouchMove = 0;
   for (const type of ['pointerdown', 'pointerup', 'pointercancel', 'click', 'touchstart', 'touchend', 'touchcancel', 'wheel', 'input', 'change', 'keydown', 'focusin', 'focusout']) {
     listen(document, type, event => {
@@ -97,22 +123,22 @@
       if (target === 'back-to-top' || ['pointerdown', 'pointerup', 'touchstart', 'touchend', 'wheel'].includes(type)) activeUntil = performance.now() + 5000;
       record('input', { type, target, pointerType: event.pointerType, trusted: event.isTrusted, eventAtMs: event.timeStamp,
         dispatchDelayMs: Math.max(0, performance.now() - event.timeStamp), key: ['Tab', 'Enter', 'Escape', ' ', 'Home', 'End', 'PageUp', 'PageDown', 'ArrowUp', 'ArrowDown'].includes(event.key) ? event.key : undefined,
-        valueLength: type === 'input' ? event.target.value?.length : undefined, x: event.clientX, y: event.clientY, scrollY });
+        valueLength: type === 'input' ? event.target.value?.length : undefined, x: event.clientX, y: event.clientY, ...position });
     }, { capture: true });
   }
   listen(document, 'touchmove', event => {
     if (performance.now() - lastTouchMove < 150) return;
     lastTouchMove = performance.now(); activeUntil = lastTouchMove + 1500;
-    record('touch-move', { target: targetName(event.target), scrollY, touches: event.touches.length });
+    record('touch-move', { target: targetName(event.target), ...position, touches: event.touches.length });
   }, { capture: true });
-  listen(document, 'scroll', () => { lastScroll = performance.now(); scrollEvents++; }, { capture: true });
-  listen(document, 'scrollend', event => record('scroll-end', { target: targetName(event.target), scrollY, scrollX }), { capture: true });
+  listen(document, 'scroll', () => { lastScroll = performance.now(); scrollEvents++; sampleScrollEvents++; scheduleGeometry(); }, { capture: true });
+  listen(document, 'scrollend', event => { record('scroll-end', { target: targetName(event.target), ...position }); scheduleGeometry(); }, { capture: true });
   for (const method of ['scrollTo', 'scrollBy']) wrap(window, method, original => function (...args) {
     const at = performance.now(); activeUntil = at + 5000;
     const options = typeof args[0] === 'object' ? { top: args[0]?.top, left: args[0]?.left, behavior: args[0]?.behavior } : { left: args[0], top: args[1] };
-    record('scroll-call', { method, options, scrollY, scrollX });
+    record('scroll-call', { method, options, ...position });
     try { return original.apply(this, args); }
-    finally { record('scroll-call-returned', { method, durationMs: performance.now() - at, scrollY, scrollX }); }
+    finally { record('scroll-call-returned', { method, durationMs: performance.now() - at, ...position }); scheduleGeometry(); }
   });
   wrap(HTMLElement.prototype, 'focus', original => function (...args) {
     const at = performance.now(); record('focus-call', { target: targetName(this), preventScroll: args[0]?.preventScroll });
@@ -127,39 +153,48 @@
       const gap = at - lastFrame;
       frames++; frameTotal += gap; worstFrame = Math.max(worstFrame, gap);
       if (gap >= 50) slowFrames++;
-      if (gap >= 100) record('frame-gap', { durationMs: gap, scrollY, recentScroll: at - lastScroll < 1000 });
+      if (gap >= 100) record('frame-gap', { durationMs: gap, ...position, recentScroll: at - lastScroll < 1000 });
     }
     lastFrame = at;
-    if ((at < activeUntil || at - lastScroll < 500) && at - lastScrollSample >= 120) {
-      record('scroll-sample', { scrollY, scrollX, events: scrollEvents });
-      lastScrollSample = at; scrollEvents = 0;
+    if (sampleScrollEvents && (at < activeUntil || at - lastScroll < 500) && at - lastScrollSample >= 120) {
+      record('scroll-sample', { ...position, events: sampleScrollEvents });
+      lastScrollSample = at; sampleScrollEvents = 0;
     }
     frame = requestAnimationFrame(measureFrame);
   }
   function pulse() {
     const now = performance.now();
     record('performance-window', { elapsedMs: now - lastHeartbeat, visible: !document.hidden, frames, averageFrameMs: frames ? frameTotal / frames : null,
-      worstFrameMs: worstFrame, slowFrames, scrollEvents, domChanges: changes, heapBytes: performance.memory?.usedJSHeapSize });
+      worstFrameMs: worstFrame, slowFrames, scrollEvents, domChanges: changes, passiveEvents, heapBytes: performance.memory?.usedJSHeapSize });
     lastHeartbeat = now; frames = 0; frameTotal = 0; worstFrame = 0; slowFrames = 0;
     changes = { batches: 0, added: 0, removed: 0, attributes: 0 };
+    scrollEvents = 0; passiveEvents = Object.create(null);
   }
   function startMeasurements() {
     if (!heartbeat) heartbeat = setInterval(pulse, 1000);
     if (!frame && !document.hidden) frame = requestAnimationFrame(measureFrame);
   }
-  function pauseMeasurements() { cancelAnimationFrame(frame); frame = 0; lastFrame = 0; clearInterval(heartbeat); heartbeat = 0; }
+  function pauseMeasurements() {
+    cancelAnimationFrame(frame); frame = 0; lastFrame = 0; clearInterval(heartbeat); heartbeat = 0;
+    cancelAnimationFrame(geometryFrame); clearTimeout(geometryTimer); geometryFrame = 0; geometryTimer = 0;
+  }
   listen(document, 'visibilitychange', () => {
     record('visibility', { visible: !document.hidden });
     pulse(); pauseMeasurements();
-    if (!document.hidden) startMeasurements();
+    if (!document.hidden) { startMeasurements(); scheduleGeometry('viewport'); }
   });
-  listen(window, 'pageshow', event => { record('pageshow', { persisted: event.persisted }); lastHeartbeat = performance.now(); startMeasurements(); });
+  listen(window, 'pageshow', event => { record('pageshow', { persisted: event.persisted }); lastHeartbeat = performance.now(); startMeasurements(); scheduleGeometry('viewport'); });
 
   // === Browser-provided performance evidence ===
   function observe(type, summarize, options = {}) {
     if (!globalThis.PerformanceObserver?.supportedEntryTypes?.includes(type)) return;
     try {
-      const observer = new PerformanceObserver(list => { for (const entry of list.getEntries()) record(type, summarize(entry)); });
+      const observer = new PerformanceObserver(list => {
+        for (const entry of list.getEntries()) {
+          const details = summarize(entry);
+          if (details) record(type, details);
+        }
+      });
       observer.observe({ type, buffered: true, ...options }); observers.push(observer);
     } catch (error) { record('observer-unavailable', { type, message: error.message }); }
   }
@@ -169,10 +204,20 @@
     domInteractiveMs: entry.domInteractive, domContentLoadedMs: entry.domContentLoadedEventEnd, loadEndMs: entry.loadEventEnd, durationMs: entry.duration }));
   observe('longtask', entry => ({ startMs: entry.startTime, durationMs: entry.duration, attribution: Array.from(entry.attribution || [], item => ({ name: item.name, container: item.containerType, url: safeUrl(item.containerSrc || '') })) }));
   observe('long-animation-frame', entry => ({ startMs: entry.startTime, durationMs: entry.duration, blockingDurationMs: entry.blockingDuration,
-    renderStartMs: entry.renderStart, styleAndLayoutStartMs: entry.styleAndLayoutStart, scripts: Array.from(entry.scripts || [], script => ({ url: safeUrl(script.sourceURL || ''),
+    firstInputMs: entry.firstUIEventTimestamp, renderStartMs: entry.renderStart, styleAndLayoutStartMs: entry.styleAndLayoutStart, scripts: Array.from(entry.scripts || [], script => ({ url: safeUrl(script.sourceURL || ''),
       function: script.sourceFunctionName, invoker: script.invoker, startMs: script.startTime, durationMs: script.duration, forcedStyleAndLayoutMs: script.forcedStyleAndLayoutDuration })) }));
-  observe('event', entry => ({ name: entry.name, target: targetName(entry.target), startMs: entry.startTime, durationMs: entry.duration,
-    processingStartMs: entry.processingStart, processingEndMs: entry.processingEnd, interactionId: entry.interactionId }), { durationThreshold: 16 });
+  const passiveEventNames = new Set(['pointerover', 'pointerout', 'pointerenter', 'pointerleave', 'mouseover', 'mouseout', 'mouseenter', 'mouseleave', 'gotpointercapture', 'lostpointercapture']);
+  observe('event', entry => {
+    if (passiveEventNames.has(entry.name)) {
+      const summary = passiveEvents[entry.name] ||= { count: 0, worstDurationMs: 0, worstDispatchDelayMs: 0 };
+      summary.count++;
+      summary.worstDurationMs = Math.max(summary.worstDurationMs, entry.duration);
+      summary.worstDispatchDelayMs = Math.max(summary.worstDispatchDelayMs, entry.processingStart - entry.startTime);
+      return null;
+    }
+    return { name: entry.name, target: targetName(entry.target), startMs: entry.startTime, durationMs: entry.duration,
+      processingStartMs: entry.processingStart, processingEndMs: entry.processingEnd, interactionId: entry.interactionId };
+  }, { durationThreshold: 16 });
   observe('layout-shift', entry => ({ startMs: entry.startTime, value: entry.value, recentInput: entry.hadRecentInput }));
   observe('paint', entry => ({ name: entry.name, startMs: entry.startTime }));
   const mutations = new MutationObserver(records => {
@@ -188,7 +233,7 @@
     for (const target of [document.querySelector('#productTable'), document.querySelector('.isi-table-region')]) if (target) resize.observe(target);
     observers.push(resize);
   });
-  listen(window, 'load', () => record('page-loaded', { state: document.readyState }));
+  listen(window, 'load', () => { record('page-loaded', { state: document.readyState }); scheduleGeometry('viewport'); });
   listen(window, 'pagehide', event => {
     record('pagehide', { persisted: event.persisted }); pulse(); pauseMeasurements();
     if (event.persisted) return;
