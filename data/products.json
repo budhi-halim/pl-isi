@@ -7131,6 +7131,11 @@
   },
   {
     "product_name": "CHEESE SEASONING",
+    "product_code": "31503429",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "CHEESE SEASONING",
     "product_code": "D-110",
     "marketing_price": "11"
   },
@@ -10371,6 +10376,11 @@
   },
   {
     "product_name": "CORN SEASONING",
+    "product_code": "31603108",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "CORN SEASONING",
     "product_code": "MT-1301006-1",
     "marketing_price": "3.75"
   },
@@ -11260,17 +11270,22 @@
     "marketing_price": ""
   },
   {
-    "product_name": "FLAMMING HOT SEASONING",
+    "product_name": "FLAMING HOT SEASONING",
+    "product_code": "31408113",
+    "marketing_price": "4.20"
+  },
+  {
+    "product_name": "FLAMING HOT SEASONING",
     "product_code": "31408120",
     "marketing_price": "4.0"
   },
   {
-    "product_name": "FLAMMING HOT SEASONING",
+    "product_name": "FLAMING HOT SEASONING",
     "product_code": "31408130",
     "marketing_price": ""
   },
   {
-    "product_name": "FLAMMING HOT SEASONING",
+    "product_name": "FLAMING HOT SEASONING",
     "product_code": "31408131",
     "marketing_price": ""
   },
@@ -14103,6 +14118,11 @@
     "product_name": "JAGUNG BAKAR KEJU SEASONING",
     "product_code": "31603022",
     "marketing_price": "4.85"
+  },
+  {
+    "product_name": "JAGUNG BAKAR KEJU SEASONING",
+    "product_code": "31603109",
+    "marketing_price": ""
   },
   {
     "product_name": "JAGUNG BAKAR MANIS PEDAS SEASONING",
