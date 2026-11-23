@@ -716,6 +716,11 @@
   },
   {
     "product_name": "AYAM BAWANG SEASONING",
+    "product_code": "31103115",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "AYAM BAWANG SEASONING",
     "product_code": "MT-1107031-0",
     "marketing_price": "2.9"
   },
@@ -1062,7 +1067,7 @@
   {
     "product_name": "AYAM TERIYAKI SEASONING",
     "product_code": "31103113",
-    "marketing_price": ""
+    "marketing_price": "3.0"
   },
   {
     "product_name": "AYAM TERIYAKI SEASONING",
@@ -1527,7 +1532,7 @@
   {
     "product_name": "BALADO SAOS PADANG SEASONING",
     "product_code": "31406301",
-    "marketing_price": "3"
+    "marketing_price": "3.20"
   },
   {
     "product_name": "BALADO SAOS PADANG SEASONING",
@@ -4750,16 +4755,6 @@
     "marketing_price": ""
   },
   {
-    "product_name": "BUMBU KALDU AYAM SEASONING",
-    "product_code": "31102992",
-    "marketing_price": "1.38"
-  },
-  {
-    "product_name": "BUMBU KALDU SAPI SEASONING",
-    "product_code": "31201655",
-    "marketing_price": "1.3"
-  },
-  {
     "product_name": "BUMBU KARI",
     "product_code": "44400087",
     "marketing_price": "5"
@@ -6632,7 +6627,7 @@
   {
     "product_name": "CHEESE SEASONING",
     "product_code": "31502944",
-    "marketing_price": "0"
+    "marketing_price": "7.25"
   },
   {
     "product_name": "CHEESE SEASONING",
@@ -7022,12 +7017,12 @@
   {
     "product_name": "CHEESE SEASONING",
     "product_code": "31503340",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "CHEESE SEASONING",
     "product_code": "31503341",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "CHEESE SEASONING",
@@ -8717,6 +8712,16 @@
   {
     "product_name": "CHILLI LIME SEASONING",
     "product_code": "31407761",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "CHILLI LIME SEASONING",
+    "product_code": "31408220",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "CHILLI LIME SEASONING",
+    "product_code": "31408221",
     "marketing_price": ""
   },
   {
@@ -11405,6 +11410,16 @@
     "marketing_price": "0"
   },
   {
+    "product_name": "FRIED CHICKEN SEASONING",
+    "product_code": "31103116",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "FRIED CHICKEN SEASONING",
+    "product_code": "31103117",
+    "marketing_price": ""
+  },
+  {
     "product_name": "FRIED CHICKEN SEASONING / GUN IV",
     "product_code": "MT-11356",
     "marketing_price": "5.0"
@@ -12143,6 +12158,11 @@
     "product_name": "GARLIC POWDER",
     "product_code": "31802732",
     "marketing_price": "0"
+  },
+  {
+    "product_name": "GARLIC POWDER",
+    "product_code": "31802735",
+    "marketing_price": ""
   },
   {
     "product_name": "GARLIC POWDER",
@@ -13512,7 +13532,7 @@
   {
     "product_name": "HOT CHILLI SEASONING",
     "product_code": "31405353",
-    "marketing_price": "3.25"
+    "marketing_price": "3.50"
   },
   {
     "product_name": "HOT CHILLI SEASONING",
@@ -13657,7 +13677,7 @@
   {
     "product_name": "HOT TOMATO SEASONING",
     "product_code": "31802476",
-    "marketing_price": "0"
+    "marketing_price": "3.85"
   },
   {
     "product_name": "HVP MEATY POWDER",
@@ -13757,6 +13777,16 @@
   {
     "product_name": "HVP POWDER",
     "product_code": "31700541",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "HVP POWDER",
+    "product_code": "31700547",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "HVP POWDER",
+    "product_code": "31700548",
     "marketing_price": ""
   },
   {
@@ -15272,7 +15302,7 @@
   {
     "product_name": "KALDU AYAM SEASONING",
     "product_code": "31103106",
-    "marketing_price": ""
+    "marketing_price": "4.0"
   },
   {
     "product_name": "KALDU AYAM SEASONING",
@@ -16637,7 +16667,7 @@
   {
     "product_name": "LIME SEASONING",
     "product_code": "31407493",
-    "marketing_price": "0"
+    "marketing_price": "5.95"
   },
   {
     "product_name": "LOBSTER PREMIX",
@@ -18250,6 +18280,11 @@
     "marketing_price": ""
   },
   {
+    "product_name": "NASI GORENG JOGJA POWDER",
+    "product_code": "31408218",
+    "marketing_price": ""
+  },
+  {
     "product_name": "NASI GORENG KAMPUNG SEASONING",
     "product_code": "31406258",
     "marketing_price": "5.8"
@@ -18661,6 +18696,11 @@
   },
   {
     "product_name": "ONION OIL",
+    "product_code": "35800058",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "ONION OIL",
     "product_code": "38800003",
     "marketing_price": ""
   },
@@ -18752,7 +18792,7 @@
   {
     "product_name": "ONION POWDER",
     "product_code": "881",
-    "marketing_price": "7.50"
+    "marketing_price": "8.0"
   },
   {
     "product_name": "ONION POWDER",
@@ -18782,17 +18822,17 @@
   {
     "product_name": "ONION POWDER / MC-I-IDS P05",
     "product_code": "881",
-    "marketing_price": "7.50"
+    "marketing_price": "8.0"
   },
   {
     "product_name": "ONION POWDER / O B00064",
     "product_code": "881",
-    "marketing_price": "7.50"
+    "marketing_price": "8.0"
   },
   {
     "product_name": "ONION POWDER / RMSEAONI01",
     "product_code": "881",
-    "marketing_price": "7.50"
+    "marketing_price": "8.0"
   },
   {
     "product_name": "ONION SEASONING",
@@ -19588,6 +19628,11 @@
     "product_name": "PASTA SAUS PADANG",
     "product_code": "34400095",
     "marketing_price": "4.8"
+  },
+  {
+    "product_name": "PASTA SAUS PADANG",
+    "product_code": "34400628",
+    "marketing_price": ""
   },
   {
     "product_name": "PATTY BURGER RENDANG SAUS",
@@ -22720,6 +22765,11 @@
     "marketing_price": ""
   },
   {
+    "product_name": "ROASTED POWDER / M 121 102",
+    "product_code": "MT-632434",
+    "marketing_price": "4.3"
+  },
+  {
     "product_name": "ROASTED POWDER / RP",
     "product_code": "MT-632434",
     "marketing_price": "4.3"
@@ -24687,6 +24737,11 @@
   {
     "product_name": "SAMBAL SEASONING",
     "product_code": "31408211",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "SAMBAL SEASONING",
+    "product_code": "31408217",
     "marketing_price": ""
   },
   {
@@ -27400,6 +27455,11 @@
     "marketing_price": ""
   },
   {
+    "product_name": "SOTO POWDER",
+    "product_code": "31408219",
+    "marketing_price": ""
+  },
+  {
     "product_name": "SOTO PREMIX",
     "product_code": "MT-708934",
     "marketing_price": "6.85"
@@ -28248,11 +28308,6 @@
     "product_name": "SPICY CHICKEN SEASONING",
     "product_code": "31408171",
     "marketing_price": ""
-  },
-  {
-    "product_name": "SPICY CHICKEN SEASONING",
-    "product_code": "MT-724411",
-    "marketing_price": "3.65"
   },
   {
     "product_name": "SPICY CORN SEASONING",
@@ -29277,7 +29332,7 @@
   {
     "product_name": "SUSU VANILLA SEASONING",
     "product_code": "31501901",
-    "marketing_price": "3.2"
+    "marketing_price": "3.7"
   },
   {
     "product_name": "SUSU VANILLA SEASONING",
@@ -30428,6 +30483,11 @@
     "product_name": "SWEET CORN SEASONING / SWEET CORN SUPER",
     "product_code": "31602017",
     "marketing_price": "2.75"
+  },
+  {
+    "product_name": "SWEET CORN SEASONING / Sweet Corn 888",
+    "product_code": "31602932",
+    "marketing_price": "5"
   },
   {
     "product_name": "SWEET CORN SEASONING / Sweet Corn 888*",
