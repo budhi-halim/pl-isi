@@ -2041,6 +2041,11 @@
   },
   {
     "product_name": "BALADO SEASONING",
+    "product_code": "31408223",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "BALADO SEASONING",
     "product_code": "E-501",
     "marketing_price": "2.1"
   },
@@ -7632,6 +7637,11 @@
   {
     "product_name": "CHICKEN HERBS SEASONING",
     "product_code": "31103015",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "CHICKEN KUNGPAO PASTE",
+    "product_code": "34100055",
     "marketing_price": ""
   },
   {
@@ -22925,6 +22935,11 @@
     "marketing_price": "2.8"
   },
   {
+    "product_name": "SALMON GARLIC BUTTER PASTE",
+    "product_code": "34800029",
+    "marketing_price": ""
+  },
+  {
     "product_name": "SALMON TERIYAKI MARINATION",
     "product_code": "31301148",
     "marketing_price": "4.20"
@@ -26696,6 +26711,11 @@
   },
   {
     "product_name": "SHALLOT OIL",
+    "product_code": "35800059",
+    "marketing_price": ""
+  },
+  {
+    "product_name": "SHALLOT OIL",
     "product_code": "38800001",
     "marketing_price": "36.0"
   },
@@ -27727,12 +27747,12 @@
   {
     "product_name": "SOUR CREAM & ONION SEASONING",
     "product_code": "31802729",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "SOUR CREAM & ONION SEASONING",
     "product_code": "31802730",
-    "marketing_price": ""
+    "marketing_price": "0"
   },
   {
     "product_name": "SOUR CREAM & ONION VEGAN SEASONING",
@@ -27993,6 +28013,11 @@
     "product_name": "SOY SAUCE POWDER",
     "product_code": "31700538",
     "marketing_price": "3.0"
+  },
+  {
+    "product_name": "SOY SAUCE POWDER",
+    "product_code": "31700549",
+    "marketing_price": ""
   },
   {
     "product_name": "SOY SAUCE POWDER",
@@ -30558,6 +30583,11 @@
     "product_name": "SWEET SHRIMP POWDER",
     "product_code": "31301739",
     "marketing_price": "0"
+  },
+  {
+    "product_name": "SWEET SHRIMP SEASONING",
+    "product_code": "31301743",
+    "marketing_price": ""
   },
   {
     "product_name": "SWEET SOUR AND SPICY SEASONING",
